@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Presensi Mandiri') }} - @yield('title', 'Dashboard')</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+
+    <!-- Styles / Scripts -->
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+                background-color: #f1f5f9;
+                color: #1e293b;
+                line-height: 1.6;
+                min-height: 100vh;
+            }
+
+            /* Header Styles */
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1rem 2rem;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .header-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .user-name {
+                font-weight: 500;
+            }
+
+            .logout-btn {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                transition: all 0.2s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .logout-btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+
+            /* Main Content */
+            .main-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+
+            /* Cards */
+            .card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .card-header {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* Time Display */
+            .time-display {
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .current-time {
+                font-size: 3rem;
+                font-weight: 700;
+                color: #1e293b;
+                line-height: 1;
+            }
+
+            .current-date {
+                font-size: 1.125rem;
+                color: #64748b;
+                margin-top: 0.5rem;
+            }
+
+            /* Buttons */
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                border: none;
+                text-decoration: none;
+                width: 100%;
+            }
+
+            .btn-datang {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+            }
+
+            .btn-datang:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+            }
+
+            .btn-datang:disabled {
+                background: #94a3b8;
+                cursor: not-allowed;
+            }
+
+            .btn-pulang {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: white;
+            }
+
+            .btn-pulang:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+            }
+
+            .btn-pulang:disabled {
+                background: #94a3b8;
+                cursor: not-allowed;
+            }
+
+            /* Info Grid */
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            .info-item {
+                background: #f8fafc;
+                padding: 1rem;
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+            }
+
+            .info-label {
+                font-size: 0.75rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0.25rem;
+            }
+
+            .info-value {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #1e293b;
+            }
+
+            /* Status Badge */
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            .status-active {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .status-inactive {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .status-pending {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            /* Location Info */
+            .location-card {
+                background: #f8fafc;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .location-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .location-icon {
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+
+            .location-title {
+                font-weight: 600;
+                color: #1e293b;
+            }
+
+            .location-subtitle {
+                font-size: 0.875rem;
+                color: #64748b;
+            }
+
+            .radius-info {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1rem;
+                background: white;
+                border-radius: 8px;
+            }
+
+            .radius-label {
+                font-size: 0.875rem;
+                color: #64748b;
+            }
+
+            .radius-value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #667eea;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header-content {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .main-content {
+                    padding: 1rem;
+                }
+
+                .info-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .current-time {
+                    font-size: 2.5rem;
+                }
+            }
+
+            /* Animations */
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+
+            .loading {
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+
+            /* Alert */
+            .alert {
+                padding: 1rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                font-size: 0.875rem;
+            }
+
+            .alert-success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+
+            .alert-error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fca5a5;
+            }
+        </style>
+    @endif
+
+    @yield('styles')
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                Presensi Mandiri
+            </div>
+            <div class="user-info">
+                <span class="user-name">{{ Auth::user()->name }}</span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="logout-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @yield('content')
+    </main>
+
+    @yield('scripts')
+</body>
+</html>

@@ -1,0 +1,361 @@
+@extends('layouts.app')
+
+@section('title', 'Dashboard Presensi')
+
+@section('content')
+<!-- Time Card -->
+<div class="card">
+    <div class="time-display">
+        <div class="current-time" id="current-time">
+            {{ $now->format('H:i:s') }}
+        </div>
+        <div class="current-date">
+            {{ $now->locale('id')->dayName }}, {{ $now->format('d F Y') }}
+        </div>
+    </div>
+</div>
+
+<!-- Presensi Buttons -->
+<div class="card">
+    <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Presensi
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <!-- Presensi Datang -->
+        <div style="text-align: center;">
+            <button type="button" id="btn-datang" class="btn btn-datang" onclick="getLocation('datang')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Presensi Datang
+            </button>
+            <p style="margin-top: 0.75rem; font-size: 0.875rem; color: #64748b;">
+                Jam: {{ $config['jam_datang_mulai'] }} - {{ $config['jam_datang_akhir'] }}
+            </p>
+            @if($canPresensiDatang)
+                <span class="status-badge status-active" style="margin-top: 0.5rem; display: inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Tersedia
+                </span>
+            @else
+                <span class="status-badge status-inactive" style="margin-top: 0.5rem; display: inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                    </svg>
+                    Tidak Tersedia
+                </span>
+            @endif
+        </div>
+
+        <!-- Presensi Pulang -->
+        <div style="text-align: center;">
+            <button type="button" id="btn-pulang" class="btn btn-pulang" onclick="getLocation('pulang')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Presensi Pulang
+            </button>
+            <p style="margin-top: 0.75rem; font-size: 0.875rem; color: #64748b;">
+                Jam: {{ $config['jam_pulang_mulai'] }} - {{ $config['jam_pulang_akhir'] }}
+            </p>
+            @if($canPresensiPulang)
+                <span class="status-badge status-active" style="margin-top: 0.5rem; display: inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Tersedia
+                </span>
+            @else
+                <span class="status-badge status-inactive" style="margin-top: 0.5rem; display: inline-flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                    </svg>
+                    Tidak Tersedia
+                </span>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- Location Info Card -->
+<div class="card">
+    <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Informasi Lokasi
+    </div>
+
+    <div class="location-card">
+        <div class="location-header">
+            <div class="location-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <div>
+                <div class="location-title">Lokasi Presensi</div>
+                <div class="location-subtitle">Kantor Pusat</div>
+            </div>
+        </div>
+
+        <div class="radius-info">
+            <div>
+                <div class="radius-label">Radius yang diijinkan</div>
+                <div class="radius-value">{{ $config['radius_presensi'] }} meter</div>
+            </div>
+        </div>
+
+        <!-- Current Location Display -->
+        <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                </svg>
+                <span style="font-weight: 500; color: #1e293b;">Posisi Anda Saat Ini</span>
+            </div>
+            <div id="current-location" style="font-size: 0.875rem; color: #64748b;">
+                <span class="loading">Mendapatkan lokasi...</span>
+            </div>
+        </div>
+
+        <!-- Distance Display -->
+        <div id="distance-display" style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div class="radius-label">Jarak ke lokasi</div>
+                    <div id="distance-value" class="radius-value">-</div>
+                </div>
+                <div id="distance-status"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Grid -->
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">Nama User</div>
+        <div class="info-value">{{ $user->name }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">Email</div>
+        <div class="info-value">{{ $user->email }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">Status Presensi Hari Ini</div>
+        <div class="info-value">
+            <span class="status-badge status-pending">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Belum Presensi
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+<div id="alert-container"></div>
+
+<script>
+    // Configuration from server
+    const config = {
+        radius: {{ $config['radius_presensi'] }},
+        lat_kantor: {{ $config['lokasi_preset']['lat'] }},
+        lng_kantor: {{ $config['lokasi_preset']['lng'] }},
+        jam_datang_mulai: '{{ $config['jam_datang_mulai'] }}',
+        jam_datang_akhir: '{{ $config['jam_datang_akhir'] }}',
+        jam_pulang_mulai: '{{ $config['jam_pulang_mulai'] }}',
+        jam_pulang_akhir: '{{ $config['jam_pulang_akhir'] }}',
+    };
+
+    let userLat = null;
+    let userLng = null;
+    let presensiType = null;
+
+    // Update time every second
+    function updateTime() {
+        fetch('/time')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('current-time').textContent = data.time;
+            })
+            .catch(error => console.error('Error fetching time:', error));
+    }
+
+    setInterval(updateTime, 1000);
+
+    // Get user location
+    function getLocation(type) {
+        presensiType = type;
+
+        if (navigator.geolocation) {
+            document.getElementById('current-location').innerHTML = '<span class="loading">Mendapatkan lokasi...</span>';
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            showAlert('Geolocation tidak didukung oleh browser ini.', 'error');
+        }
+    }
+
+    function showPosition(position) {
+        userLat = position.coords.latitude;
+        userLng = position.coords.longitude;
+
+        document.getElementById('current-location').innerHTML =
+            'Lat: ' + userLat.toFixed(6) + ', Lng: ' + userLng.toFixed(6);
+
+        // Calculate distance
+        const distance = calculateDistance(
+            userLat, userLng,
+            config.lat_kantor, config.lng_kantor
+        );
+
+        // Show distance
+        const distanceDisplay = document.getElementById('distance-display');
+        const distanceValue = document.getElementById('distance-value');
+        const distanceStatus = document.getElementById('distance-status');
+
+        distanceDisplay.style.display = 'block';
+        distanceValue.textContent = distance.toFixed(2) + ' meter';
+
+        if (distance <= config.radius) {
+            distanceStatus.innerHTML = '<span class="status-badge status-active"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><polyline points="20 6 9 17 4 12"/></svg>Dalam Radius</span>';
+
+            // Submit presensi
+            submitPresensi(distance);
+        } else {
+            distanceStatus.innerHTML = '<span class="status-badge status-inactive"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Luar Radius</span>';
+            showAlert('Anda berada di luar radius presensi!', 'error');
+        }
+    }
+
+    function showError(error) {
+        let message = 'Terjadi kesalahan dalam mendapatkan lokasi.';
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                message = 'Izin lokasi ditolak. Mohon aktifkan lokasi.';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                message = 'Informasi lokasi tidak tersedia.';
+                break;
+            case error.TIMEOUT:
+                message = 'Permintaan lokasi habis waktu.';
+                break;
+        }
+        showAlert(message, 'error');
+        document.getElementById('current-location').textContent = message;
+    }
+
+    // Calculate distance using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000; // Earth's radius in meters
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = lat2 * Math.PI / 180;
+        const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+        const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                  Math.cos(phi1) * Math.cos(phi2) *
+                  Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+    }
+
+    // Submit presensi
+    function submitPresensi(distance) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        fetch('/presensi', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                type: presensiType,
+                latitude: userLat,
+                longitude: userLng,
+                distance: distance
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Terjadi kesalahan saat提交 presensi.', 'error');
+        });
+    }
+
+    // Show alert
+    function showAlert(message, type) {
+        const container = document.getElementById('alert-container');
+        container.innerHTML = `
+            <div class="alert alert-${type}">
+                ${message}
+            </div>
+        `;
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    // Initial location check
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                userLat = position.coords.latitude;
+                userLng = position.coords.longitude;
+
+                document.getElementById('current-location').innerHTML =
+                    'Lat: ' + userLat.toFixed(6) + ', Lng: ' + userLng.toFixed(6);
+
+                const distance = calculateDistance(
+                    userLat, userLng,
+                    config.lat_kantor, config.lng_kantor
+                );
+
+                const distanceDisplay = document.getElementById('distance-display');
+                const distanceValue = document.getElementById('distance-value');
+                const distanceStatus = document.getElementById('distance-status');
+
+                distanceDisplay.style.display = 'block';
+                distanceValue.textContent = distance.toFixed(2) + ' meter';
+
+                if (distance <= config.radius) {
+                    distanceStatus.innerHTML = '<span class="status-badge status-active">Dalam Radius</span>';
+                } else {
+                    distanceStatus.innerHTML = '<span class="status-badge status-inactive">Luar Radius</span>';
+                }
+            },
+            function(error) {
+                document.getElementById('current-location').textContent = 'Tidak dapat mendapatkan lokasi';
+            }
+        );
+    }
+</script>
+@endsection
