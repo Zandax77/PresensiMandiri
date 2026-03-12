@@ -146,6 +146,7 @@ class KendaliUtama extends Controller
                     'sakit' => $sakit,
                     'alfa' => $alfa,
                     'persentase_hadir' => $totalSiswa > 0 ? round(($hadir / $totalSiswa) * 100, 1) : 0,
+                    'alfa_students' => [],
                 ];
             }
         }
@@ -281,6 +282,7 @@ class KendaliUtama extends Controller
                     'izin' => $izin,
                     'sakit' => $sakit,
                     'alfa' => $alfa,
+                    'alfa_students' => [],
                     'persentase_hadir' => $totalSiswa > 0 ? round(($hadir / $totalSiswa) * 100, 1) : 0,
                 ];
             }

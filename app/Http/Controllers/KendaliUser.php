@@ -292,13 +292,16 @@ class KendaliUser extends Controller
         }
 
         // Get selected date (default: today)
-        $tanggal = $request->get('tanggal', Carbon::now()->toDateString());
+$tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString());
 
         // Ensure $tanggal is a Carbon instance for proper date comparison
         $tanggalCarbon = $tanggal instanceof Carbon ? $tanggal : Carbon::parse($tanggal);
 
         // Get students in this class with their user data
         $siswaList = Siswa::where('kelas', $user->kelas)
+            ->whereHas('user', function($q) {
+                $q->where('is_active', 1);
+            })
             ->with('user')
             ->get()
             ->map(function ($siswa) use ($tanggal, $tanggalCarbon) {
@@ -313,6 +316,7 @@ class KendaliUser extends Controller
                     ->where('status', 'diterima')
                     ->whereDate('tanggal_awal', '<=', $tanggalCarbon)
                     ->whereDate('tanggal_akhir', '>=', $tanggalCarbon)
+                    ->orderBy('created_at', 'desc')
                     ->first();
 
                 // Determine status: use presensi if exists, otherwise check pengajuan
@@ -320,9 +324,15 @@ class KendaliUser extends Controller
                 $keterangan = null;
 
                 if ($presensi) {
-                    // Use presensi status if exists
-                    $status = $presensi->status;
-                    $keterangan = $presensi->keterangan;
+                    // Validate presensi has arrival time
+                    if (!$presensi->jam_datang) {
+                        $status = 'alfa';
+                        $keterangan = 'Presensi tidak lengkap (tanpa jam datang)';
+                    } else {
+                        // Use presensi status if exists and valid
+                        $status = $presensi->status;
+                        $keterangan = $presensi->keterangan;
+                    }
                 } elseif ($izinRequest) {
                     // Use pengajuan status if no presensi record
                     $status = $izinRequest->jenis_izin; // 'izin' or 'sakit'

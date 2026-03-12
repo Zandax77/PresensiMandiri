@@ -228,18 +228,13 @@ class PresensiRecorder extends Controller
      */
     public function getPresensi(Request $request)
     {
-        $request->validate([
-            'tanggal' => 'required|date',
-        ]);
+        $tanggal = $request->input('tanggal', Carbon::now()->toDateString());
 
         $user = Auth::user();
-        $tanggal = $request->input('tanggal');
-
         $query = Presensi::whereDate('tanggal', $tanggal)
             ->with(['user', 'siswa']);
 
         if ($user->role === 'wali_kelas') {
-            // Filter by siswa.kelas to match the student list filter
             $query->whereHas('siswa', function ($q) {
                 $q->where('kelas', Auth::user()->kelas);
             });

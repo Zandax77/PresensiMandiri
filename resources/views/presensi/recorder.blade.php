@@ -4,10 +4,95 @@
 
 @section('styles')
 <style>
+    /* Prevent horizontal scroll on mobile */
+    * {
+        box-sizing: border-box;
+    }
+
+    body, html {
+        overflow-x: hidden;
+    }
+
     .recorder-container {
-        padding: 2rem;
-        max-width: 1400px;
+        padding: 1rem;
+        max-width: 100%;
         margin: 0 auto;
+        overflow-x: hidden;
+    }
+.recorder-container {
+        padding: 1rem;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+@media (max-width: 480px) {
+        .recorder-container {
+            padding: 0.25rem;
+        }
+
+        .card {
+            padding: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+        }
+
+        .presensi-table {
+            font-size: 0.75rem;
+        }
+
+        .presensi-table th, .presensi-table td {
+            padding: 0.4rem 0.2rem;
+        }
+
+        .jam-cell {
+            font-size: 0.8rem;
+        }
+
+        .qr-reader {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 160px !important;
+            border-radius: 6px;
+        }
+
+        .qr-scanner-section p {
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .scanner-controls {
+            margin-top: 0.75rem;
+        }
+
+        .scanner-controls {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .scanner-controls .btn {
+            padding: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        #scanner-status {
+            font-size: 0.85rem;
+        }
+
+        .btn {
+            padding: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .tab-button {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.75rem;
+        }
     }
 
     .page-header {
@@ -88,6 +173,18 @@
         text-align: center;
     }
 
+    /* Fix QR preview overlap */
+    #qr-reader {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+
+    .scanner-controls {
+        position: relative;
+        z-index: 10;
+        margin-top: 1rem;
+    }
+
     #qr-video {
         width: 100%;
         max-width: 300px;
@@ -110,6 +207,11 @@
         border: 1px solid #86efac;
         color: #166534;
         display: block;
+    }
+
+    /* Search Container */
+    .search-container {
+        position: relative;
     }
 
     /* Search Form */
@@ -146,6 +248,46 @@
         outline: none;
         border-color: #667eea;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Mobile Search Optimizations */
+    @media (max-width: 480px) {
+        .form-label {
+            font-size: 0.8rem;
+        }
+
+        .form-input {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .search-dropdown {
+            max-height: 250px;
+            z-index: 1000;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .dropdown-item-name {
+            font-size: 0.85rem;
+            margin-bottom: 0.125rem;
+        }
+
+        .dropdown-item-nis {
+            font-size: 0.75rem;
+        }
+
+        .tabs {
+            gap: 0.25rem;
+        }
+
+        .tab-button {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
     }
 
     .btn {
@@ -216,10 +358,62 @@
     }
 
     /* Presensi Table */
+    /* Presensi Table - Mobile Optimized */
     .presensi-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 1rem;
+        table-layout: fixed;
+        font-size: 0.85rem;
+    }
+
+    .presensi-table th,
+    .presensi-table td {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.82rem;
+        border: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+
+    .presensi-table th {
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: #f8fafc;
+    }
+
+    .presensi-table th.nis-cell,
+    .presensi-table td.nis-cell {
+        max-width: 60px;
+        font-size: 0.75rem;
+    }
+
+    .presensi-table th:nth-child(2),
+    .presensi-table td:nth-child(2) {
+        max-width: 80px;
+    }
+
+    .presensi-table .status-badge {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+        .presensi-table {
+            font-size: 0.75rem;
+        }
+
+        .presensi-table th,
+        .presensi-table td {
+            padding: 0.4rem 0.2rem;
+            font-size: 0.7rem;
+        }
+
+        .presensi-table .status-badge {
+            padding: 0.15rem 0.3rem;
+            font-size: 0.6rem;
+        }
     }
 
     .presensi-table thead {
@@ -269,9 +463,10 @@
         color: #991b1b;
     }
 
-    .jam-cell {
+.jam-cell {
         font-family: 'Courier New', monospace;
-        font-size: 0.875rem;
+        font-size: 1rem;
+        font-weight: 600;
         text-align: center;
     }
 
@@ -283,8 +478,9 @@
 
     /* Search Dropdown */
     .search-dropdown {
-        position: absolute;
-        top: 100%;
+        position: fixed;
+        top: auto;
+        bottom: 100%;
         left: 0;
         right: 0;
         background: white;
@@ -292,10 +488,12 @@
         border-radius: 8px;
         max-height: 300px;
         overflow-y: auto;
-        margin-top: 0.5rem;
-        z-index: 100;
+        margin-bottom: 0.5rem;
+        z-index: 1000;
         display: none;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100vw;
+        max-width: none;
     }
 
     .search-dropdown.show {
@@ -333,7 +531,7 @@
     .spinner {
         border: 3px solid #f1f5f9;
         border-top: 3px solid #667eea;
-        border-radius: 50%;
+        border-radius possiede 50%;
         width: 20px;
         height: 20px;
         animation: spin 1s linear infinite;
@@ -360,12 +558,20 @@
     /* Scanner Controls */
     .scanner-controls {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
         margin: 1rem 0;
+        flex-wrap: wrap;
     }
 
     .scanner-controls button {
         flex: 1;
+        min-width: 120px;
+    }
+
+    @media (max-width: 480px) {
+        .scanner-controls {
+            gap: 0.5rem;
+        }
     }
 
     /* Tabs for switching views */
@@ -434,11 +640,19 @@
         font-weight: 700;
         color: #1e293b;
     }
-
 </style>
 
-<!-- QR Code Scanner Library -->
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.4/dist/html5-qrcode.min.js"></script>
+<!-- Fixed QR Library CDN - reliable jsDelivr -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+window.addEventListener('load', () => {
+    if (typeof Html5Qrcode !== 'undefined') {
+        console.log('✅ QR Scanner loaded successfully');
+    } else {
+        console.error('❌ QR library failed to load');
+    }
+});
+</script>
 @endsection
 
 @section('content')
@@ -471,11 +685,11 @@
                     <div class="search-section">
                         <div class="form-group">
                             <label class="form-label">Cari Siswa (NIS atau Nama)</label>
-                            <div style="position: relative;">
-                                <input 
-                                    type="text" 
-                                    id="search-input" 
-                                    class="form-input" 
+                            <div class="search-container">
+                                <input
+                                    type="text"
+                                    id="search-input"
+                                    class="form-input"
                                     placeholder="Ketik NIS atau nama siswa..."
                                     autocomplete="off">
                                 <div id="search-dropdown" class="search-dropdown">
@@ -508,8 +722,8 @@
                 <div id="qr-tab" class="tab-content">
                     <div class="qr-scanner-section">
                         <p style="color: #64748b; margin-bottom: 1rem;">Arahkan QR Code ke kamera</p>
-                        <video id="qr-video" style="width: 100%; max-width: 300px; border-radius: 8px;"></video>
-                        
+                        <div id="qr-reader" style="width: 100%; max-width: 320px; height: 240px; border-radius: 8px; border: 2px solid #e2e8f0; background: #f8fafc; margin: 0 auto;"></div>
+
                         <div class="scanner-controls">
                             <button class="btn btn-primary btn-small" onclick="startQRScanner()">
                                 <span id="scanner-status">▶ Mulai Scan</span>
@@ -519,9 +733,17 @@
                             </button>
                         </div>
 
-                        <div id="qr-scanner-result" class="qr-scanner-result">
+<div id="qr-scanner-result" class="qr-scanner-result">
                             <div id="qr-result-name"></div>
                             <div id="qr-result-nis" style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;"></div>
+                            <div id="qr-buttons" style="display: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                <button class="btn btn-success" onclick="recordPresensi('datang')">
+                                    <strong>✓</strong> Datang
+                                </button>
+                                <button class="btn btn-danger" onclick="recordPresensi('pulang')">
+                                    <strong>✓</strong> Pulang
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -548,64 +770,58 @@
                     </div>
                 </div>
 
-                <div style="overflow-x: auto;">
+                <div class="table-responsive">
                     <table class="presensi-table">
                         <thead>
                             <tr>
-                                <th>NIS</th>
-                                <th>Nama Siswa</th>
-                                <th>Kelas</th>
-                                <th>Datang</th>
-                                <th>Pulang</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
+                                <th style="width: 45%;">Siswa</th>
+                                <th style="width: 18%;">Datang</th>
+                                <th style="width: 18%;">Pulang</th>
+                                <th style="width: 19%;">Status</th>
                             </tr>
                         </thead>
                         <tbody id="presensi-tbody">
                             @forelse($students as $student)
-                            @php
-                                $presensi = $presensis[$student->user_id] ?? null;
-                                $jamDatang = $presensi?->jam_datang ? \Carbon\Carbon::parse($presensi->jam_datang)->format('H:i') : '-';
-                                $jamPulang = $presensi?->jam_pulang ? \Carbon\Carbon::parse($presensi->jam_pulang)->format('H:i') : '-';
-                                
-                                // Determine status
-                                if ($presensi && $presensi->jam_datang && $presensi->jam_pulang) {
-                                    $statusClass = 'status-hadir';
-                                    $statusText = 'Hadir';
-                                } elseif ($presensi && $presensi->jam_datang) {
-                                    $statusClass = 'status-hadir';
-                                    $statusText = 'Datang';
-                                } else {
-                                    $statusClass = 'status-belum';
-                                    $statusText = 'Belum';
-                                }
-                            @endphp
-                            <tr data-student-id="{{ $student->id }}" data-user-id="{{ $student->user_id }}">
-                                <td class="nis-cell">{{ $student->nis }}</td>
-                                <td>{{ $student->nama }}</td>
-                                <td>{{ $student->kelas ?? $student->user->kelas ?? '-' }}</td>
-                                <td class="jam-cell" id="jam-datang-{{ $student->user_id }}">{{ $jamDatang }}</td>
-                                <td class="jam-cell" id="jam-pulang-{{ $student->user_id }}">{{ $jamPulang }}</td>
-                                <td>
-                                    <span class="status-badge {{ $statusClass }}" id="status-{{ $student->user_id }}">
-                                        {{ $statusText }}
-                                    </span>
-                                </td>
-                                <td class="actions-cell">
-                                    <button class="btn btn-success btn-small" onclick="recordFromTable('{{ $student->id }}', 'datang')">
-                                        Datang
-                                    </button>
-                                    <button class="btn btn-danger btn-small" onclick="recordFromTable('{{ $student->id }}', 'pulang')">
-                                        Pulang
-                                    </button>
-                                </td>
-                            </tr>
+                                @php
+                                    $presensi = $presensis[$student->user_id] ?? null;
+                                    $jamDatang = $presensi?->jam_datang ? \Carbon\Carbon::parse($presensi->jam_datang)->format('H:i') : '-';
+                                    $jamPulang = $presensi?->jam_pulang ? \Carbon\Carbon::parse($presensi->jam_pulang)->format('H:i') : '-';
+                                    if ($presensi && $presensi->jam_datang && $presensi->jam_pulang) {
+                                        $statusClass = 'status-hadir';
+                                        $statusText = 'Hadir';
+                                    } elseif ($presensi && $presensi->jam_datang) {
+                                        $statusClass = 'status-hadir';
+                                        $statusText = 'Datang';
+                                    } else {
+                                        $statusClass = 'status-belum';
+                                        $statusText = 'Belum';
+                                    }
+                                @endphp
+                                <tr data-student-id="{{ $student->id }}" data-user-id="{{ $student->user_id }}">
+                                    <td style="vertical-align: top; padding-left: 0.4rem;">
+                                        <div style="font-weight: 600; font-size: 0.85rem;">{{ Str::limit($student->nama, 12) }}</div>
+                                        <div style="font-size: 0.7rem; color: #6b7280; font-weight: normal; margin-top: 0.1rem;">
+                                            {{ $student->nis }} • {{ $student->kelas ?? $student->user->kelas ?? '-' }}
+                                        </div>
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 0.9rem; font-weight: 600;">
+                                        {{ $jamDatang }}
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 0.9rem; font-weight: 600;">
+                                        {{ $jamPulang }}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge {{ $statusClass }}" id="status-{{ $student->user_id }}">
+                                            {{ $statusText }}
+                                        </span>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">
-                                    Tidak ada siswa
-                                </td>
-                            </tr>
+                                <tr>
+<td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                                        Tidak ada siswa
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -628,7 +844,6 @@ const searchResult = document.getElementById('search-result');
 // Search functionality
 searchInput.addEventListener('input', async function(e) {
     const query = e.target.value.trim();
-    
     if (query.length < 1) {
         searchDropdown.classList.remove('show');
         return;
@@ -637,18 +852,15 @@ searchInput.addEventListener('input', async function(e) {
     try {
         const response = await fetch(`{{ route('presensi-recorder.search') }}?q=${encodeURIComponent(query)}`);
         const data = await response.json();
-        
+
         searchDropdown.innerHTML = '';
-        
         if (data.length > 0) {
             data.forEach(student => {
                 const item = document.createElement('div');
                 item.className = 'dropdown-item';
                 item.innerHTML = `
-                    <div>
-                        <div class="dropdown-item-name">${student.nama}</div>
-                        <div class="dropdown-item-nis">NIS: ${student.nis} | Kelas: ${student.kelas || '-'}</div>
-                    </div>
+                    <div class="dropdown-item-name">${student.nama}</div>
+                    <div class="dropdown-item-nis">NIS: ${student.nis} | Kelas: ${student.kelas || '-'}</div>
                 `;
                 item.onclick = () => selectStudent(student);
                 searchDropdown.appendChild(item);
@@ -666,231 +878,169 @@ searchInput.addEventListener('input', async function(e) {
 function selectStudent(student) {
     selectedStudentId = student.id;
     selectedStudentUserId = student.user_id;
-    
     document.getElementById('result-name').textContent = student.nama;
     document.getElementById('result-nis').textContent = student.nis;
     document.getElementById('result-kelas').textContent = student.kelas || '-';
-    
     searchInput.value = student.nama;
     searchDropdown.classList.remove('show');
     searchResult.style.display = 'block';
 }
 
 function switchInputMethod(method, evt) {
-    // Update tabs
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    if (evt && evt.target) {
-        evt.target.classList.add('active');
-    }
-    
-    // Update content
+    if (evt && evt.target) evt.target.classList.add('active');
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     if (method === 'search') {
         document.getElementById('search-tab').classList.add('active');
         if (isScanning) stopQRScanner();
     } else {
         document.getElementById('qr-tab').classList.add('active');
-        // automatically start scanner when switching to QR tab
         startQRScanner();
     }
 }
 
 function startQRScanner() {
-    if (isScanning) return;
-    
+    if (isScanning || typeof Html5Qrcode === 'undefined') {
+        if (typeof Html5Qrcode === 'undefined') showNotification('QR library not loaded. Refresh page.', 'error');
+        return;
+    }
+
     isScanning = true;
-    document.getElementById('scanner-status').textContent = '⏹ Menghentikan...';
+    document.getElementById('scanner-status').textContent = '🔄 Starting camera...';
     document.getElementById('stop-scanner-btn').style.display = 'block';
-    
-    const video = document.getElementById('qr-video');
-    video.style.display = 'block';
-    
-    Html5Qrcode.getCameras().then(cameras => {
-        if (cameras && cameras.length) {
-            const cameraId = cameras[0].id;
-            qrScanner = new Html5Qrcode("qr-video");
-            
-            qrScanner.start(
-                cameraId,
-                {
-                    fps: 10,
-                    qrbox: {width: 250, height: 250},
-                },
-                (decodedText, decodedResult) => {
-                    handleQRCode(decodedText);
-                    stopQRScanner();
-                },
-                (errorMessage) => {
-                    // Silently ignore frame errors but log for debugging
-                    console.warn('QR scan error:', errorMessage);
-                }
-            ).catch(err => {
-                console.error('Failed to start QR scanner:', err);
-                alert('Tidak dapat mengaktifkan kamera. Pastikan izin diberikan atau perangkat memiliki kamera.');
-                isScanning = false;
-            });
-        } else {
-            console.warn('No cameras found');
-            alert('Tidak ada kamera terdeteksi pada perangkat ini');
-            isScanning = false;
-        }
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+    const config = { fps: 10, qrbox: {width: 250, height: 250}, aspectRatio: 1.0 };
+
+    qrScanner.start(
+        { facingMode: 'environment' },
+        config,
+        (decodedText) => {
+            console.log('✅ QR scanned:', decodedText);
+            handleQRCode(decodedText);
+            stopQRScanner();
+        },
+        (error) => console.debug('Scan frame error:', error)
+    ).then(() => {
+        console.log('✅ Scanner started');
+        document.getElementById('scanner-status').textContent = '✅ Scanning active';
+        showNotification('Camera ready - point QR code', 'success');
     }).catch(err => {
-        console.error('Error fetching cameras:', err);
-        alert('Gagal mengakses kamera: ' + err.message);
+        console.error('Camera start failed:', err);
+        showNotification('Camera access denied/blocked. Use manual search.', 'error');
         isScanning = false;
+        document.getElementById('stop-scanner-btn').style.display = 'none';
+        document.getElementById('scanner-status').textContent = '▶ Mulai Scan';
     });
 }
 
 function stopQRScanner() {
     if (qrScanner) {
-        qrScanner.stop();
+        qrScanner.stop().then(() => console.log('Scanner stopped')).catch(console.error);
         qrScanner = null;
     }
     isScanning = false;
-    document.getElementById('qr-video').style.display = 'none';
     document.getElementById('scanner-status').textContent = '▶ Mulai Scan';
     document.getElementById('stop-scanner-btn').style.display = 'none';
+    document.getElementById('qr-scanner-result').classList.remove('success');
 }
 
-function handleQRCode(qrData) {
-    // Assuming QR code contains NIS
-    fetch(`{{ route('presensi-recorder.search') }}?q=${encodeURIComponent(qrData)}`)
-        .then(response => response.json())
+function handleQRCode(decodedText) {
+    console.log('QR data:', decodedText);
+    let nis = decodedText.trim();
+    try {
+        const json = JSON.parse(decodedText);
+        nis = json.nis || json.NIS || nis;
+    } catch (e) {}
+
+    fetch(`{{ route('presensi-recorder.search') }}?q=${encodeURIComponent(nis)}`)
+        .then(r => r.json())
         .then(data => {
-            if (data.length > 0) {
+            if (data.length) {
                 const student = data[0];
                 selectedStudentId = student.id;
-                selectedStudentUserId = student.user_id;
-                
                 document.getElementById('qr-result-name').innerHTML = `<strong>${student.nama}</strong>`;
                 document.getElementById('qr-result-nis').innerHTML = `NIS: ${student.nis} | Kelas: ${student.kelas || '-'}`;
-                document.getElementById('qr-scanner-result').classList.add('success');
+document.getElementById('qr-scanner-result').classList.add('success');
+                document.getElementById('qr-buttons').style.display = 'grid';
+                showNotification(`Found: ${student.nama}`, 'success');
+            } else {
+                showNotification(`Student NIS "${nis}" not found`, 'error');
             }
-        });
+        }).catch(console.error);
 }
 
-function recordPresensi(tipe) {
-    if (!selectedStudentId) {
-        alert('Pilih siswa terlebih dahulu');
-        return;
-    }
-    
-    recordAttendance(selectedStudentId, tipe);
+function recordPresensi(type) {
+    if (!selectedStudentId) return alert('Pilih siswa dulu');
+    recordAttendance(selectedStudentId, type);
 }
 
-function recordFromTable(siswaId, tipe) {
-    recordAttendance(siswaId, tipe);
+function recordFromTable(id, type) {
+    recordAttendance(id, type);
 }
 
-async function recordAttendance(siswaId, tipe) {
-    try {
-        const response = await fetch(`{{ route('presensi-recorder.store') }}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-            body: JSON.stringify({
-                siswa_id: siswaId,
-                tipe: tipe,
-            }),
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showNotification(data.message, 'success');
-            updatePresensiTable();
-            
-            // Reset search
-            if (selectedStudentId === siswaId) {
-                selectedStudentId = null;
-                selectedStudentUserId = null;
-                document.getElementById('search-input').value = '';
-                document.getElementById('search-result').style.display = 'none';
-            }
-        } else {
-            showNotification(data.message, 'error');
+async function recordAttendance(id, type) {
+    const response = await fetch('{{ route("presensi-recorder.store") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ siswa_id: id, tipe: type })
+    });
+    const result = await response.json();
+    showNotification(result.message || 'Error', result.success ? 'success' : 'error');
+    if (result.success) {
+        updatePresensiTable();
+        if (selectedStudentId == id) {
+            selectedStudentId = null;
+            searchResult.style.display = 'none';
+            searchInput.value = '';
         }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Terjadi kesalahan saat mencatat presensi', 'error');
     }
 }
 
 async function updatePresensiTable() {
-    try {
-        const response = await fetch(`{{ route('presensi-recorder.get-presensi') }}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            },
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            let presentCount = 0;
-            
-            data.data.forEach(presensi => {
-                const userId = presensi.user_id;
-                const row = document.querySelector(`[data-user-id="${userId}"]`);
-                
-                if (row) {
-                    if (presensi.jam_datang) {
-                        document.getElementById(`jam-datang-${userId}`).textContent = presensi.jam_datang;
-                    }
-                    if (presensi.jam_pulang) {
-                        document.getElementById(`jam-pulang-${userId}`).textContent = presensi.jam_pulang;
-                    }
-                    
-                    if (presensi.jam_datang && presensi.jam_pulang) {
-                        document.getElementById(`status-${userId}`).className = 'status-badge status-hadir';
-                        document.getElementById(`status-${userId}`).textContent = 'Hadir';
-                        presentCount++;
-                    } else if (presensi.jam_datang) {
-                        document.getElementById(`status-${userId}`).className = 'status-badge status-hadir';
-                        document.getElementById(`status-${userId}`).textContent = 'Datang';
-                        presentCount++;
-                    }
+    const response = await fetch(`{{ route('presensi-recorder.get-presensi') }}?tanggal={{ $today }}`);
+    const data = await response.json();
+    if (data.success) {
+        let count = 0;
+        data.data.forEach(p => {
+            const uid = p.user_id;
+            const row = document.querySelector(`[data-user-id="${uid}"]`);
+            if (row) {
+                if (p.jam_datang) document.getElementById(`jam-datang-${uid}`).textContent = p.jam_datang;
+                if (p.jam_pulang) document.getElementById(`jam-pulang-${uid}`).textContent = p.jam_pulang;
+                if (p.jam_datang) {
+                    document.getElementById(`status-${uid}`).textContent = p.jam_pulang ? 'Hadir' : 'Datang';
+                    document.getElementById(`status-${uid}`).className = 'status-badge status-hadir';
+                    count++;
                 }
-            });
-            
-            document.getElementById('present-count').textContent = presentCount;
-            document.getElementById('absent-count').textContent = {{ $students->count() }} - presentCount;
-        }
-    } catch (error) {
-        console.error('Error updating table:', error);
+            }
+        });
+        document.getElementById('present-count').textContent = count;
+        document.getElementById('absent-count').textContent = {{ $students->count() }} - count;
     }
 }
 
-function showNotification(message, type) {
-    // Simple notification - can be replaced with a toast library
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type}`;
-    notification.style.position = 'fixed';
-    notification.style.top = '2rem';
-    notification.style.right = '2rem';
-    notification.style.zIndex = '1000';
-    notification.style.maxWidth = '400px';
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+function showNotification(msg, type) {
+    const n = document.createElement('div');
+    n.className = `alert alert-${type}`;
+    n.style.cssText = 'position:fixed;top:2rem;right:2rem;z-index:10000;max-width:400px;padding:1rem;border-radius:8px;';
+    n.textContent = msg;
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 4000);
 }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-    if (e.target !== searchInput && e.target !== searchDropdown) {
+document.addEventListener('click', e => {
+    if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
         searchDropdown.classList.remove('show');
     }
 });
 
-// Initial load
+// Load complete
+console.log('Presensi recorder loaded');
 updatePresensiTable();
 </script>
 @endsection
