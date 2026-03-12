@@ -306,25 +306,33 @@
 
     /* Holiday Section */
     .holiday-list {
-        margin-top: 1rem;
+        margin-top: 1.5rem;
     }
 
     .holiday-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
+        padding: 1.25rem;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
         border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         flex-wrap: wrap;
         gap: 1rem;
+        transition: all 0.2s;
+    }
+
+    .holiday-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        border-color: #c7d2fe;
     }
 
     .holiday-item.inactive {
-        opacity: 0.6;
-        background: #f1f5f9;
+        opacity: 0.7;
+        background: #f8fafc;
+        border-color: #e2e8f0;
     }
 
     .holiday-info {
@@ -332,82 +340,223 @@
         align-items: center;
         gap: 1rem;
         flex-wrap: wrap;
+        flex: 1;
     }
 
     .holiday-badge {
-        padding: 0.25rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         border-radius: 9999px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
     }
 
     .holiday-badge.nasional {
-        background: #fee2e2;
-        color: #991b1b;
+        background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+        color: #7f1d1d;
+        border: 1px solid #fca5a5;
     }
 
     .holiday-badge.sekolah {
-        background: #dbeafe;
-        color: #1e40af;
+        background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%);
+        color: #1e3a8a;
+        border: 1px solid #a5b4fc;
     }
 
     .holiday-date {
-        font-weight: 600;
+        font-weight: 700;
         color: #1e293b;
-    }
-
-    .holiday-name {
-        color: #64748b;
-        font-size: 0.875rem;
-    }
-
-    .holiday-actions {
+        font-size: 1rem;
         display: flex;
+        align-items: center;
         gap: 0.5rem;
     }
 
-    .btn-toggle {
-        padding: 0.5rem;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
+    .holiday-date::before {
+        content: "📅";
+        font-size: 0.9em;
     }
 
-    .btn-toggle.active {
-        background: #fef3c7;
-        color: #92400e;
+    .holiday-name {
+        color: #475569;
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .btn-toggle.inactive {
+    .holiday-name::before {
+        content: "📌";
+        font-size: 0.9em;
+    }
+
+    .holiday-days {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-left: 0.5rem;
+    }
+
+    .holiday-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 9999px;
+        background: #f1f5f9;
+        color: #64748b;
+        margin-left: 0.75rem;
+    }
+
+    .holiday-status.active {
         background: #dcfce7;
         color: #166534;
     }
 
+    .holiday-status.inactive {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .holiday-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-toggle, .btn-delete {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+        font-weight: 600;
+        gap: 0.5rem;
+        min-width: 100px;
+    }
+
+    .btn-toggle {
+        background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+        color: #166534;
+    }
+
+    .btn-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+    }
+
+    .btn-toggle.active {
+        background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+        color: #92400e;
+    }
+
     .btn-delete {
-        background: #fee2e2;
-        color: #991b1b;
+        background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+        color: #7f1d1d;
     }
 
     .btn-delete:hover {
-        background: #fecaca;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
     }
 
     /* Add Holiday Form */
     .add-holiday-form {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr auto;
-        gap: 1rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
         align-items: end;
-        padding: 1rem;
-        background: #f8fafc;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .add-holiday-form .btn-primary {
+        grid-column: 1 / -1;
+    }
+
+    .add-holiday-form .form-group {
+        margin-bottom: 0;
+        position: relative;
+    }
+
+    .add-holiday-form .form-group small {
+        position: absolute;
+        bottom: -1.25rem;
+        left: 0;
+        white-space: nowrap;
+    }
+
+    .add-holiday-form .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .add-holiday-form .form-label::before {
+        content: "✨";
+        font-size: 0.9em;
+    }
+
+    .add-holiday-form .form-input,
+    .add-holiday-form .form-select {
+        background: white;
+        border: 1px solid #cbd5e1;
         border-radius: 8px;
-        margin-bottom: 1.5rem;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        height: 2.625rem;
+    }
+
+    .add-holiday-form .form-input:focus,
+    .add-holiday-form .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+
+    .add-holiday-form .btn-primary {
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+        height: fit-content;
     }
 
     @media (max-width: 768px) {
         .add-holiday-form {
             grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .holiday-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .holiday-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .btn-toggle, .btn-delete {
+            min-width: auto;
+            flex: 1;
         }
     }
 
@@ -455,6 +604,9 @@
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 @endsection
 
 @section('content')
@@ -531,6 +683,52 @@
                     <div class="form-group">
                         <label class="form-label">Email</label>
                         <input type="email" name="email" class="form-input" value="{{ old('email', $sekolah->email) }}">
+                    </div>
+                </div>
+
+                <!-- Location Coordinates Section -->
+                <div class="map-section" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+                    <h2 class="form-title">Lokasi Sekolah</h2>
+                    <p class="form-hint" style="margin-bottom: 1.5rem;">Atur lokasi sekolah untuk validasi kehadiran. Klik pada peta atau gunakan tombol untuk mendapatkan lokasi saat ini.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Latitude</label>
+                            <input type="text"
+                                   name="latitude"
+                                   id="latitude"
+                                   class="form-input"
+                                   value="{{ old('latitude', $sekolah->latitude) }}"
+                                   placeholder="Contoh: -6.200000"
+                                   readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Longitude</label>
+                            <input type="text"
+                                   name="longitude"
+                                   id="longitude"
+                                   class="form-input"
+                                   value="{{ old('longitude', $sekolah->longitude) }}"
+                                   placeholder="Contoh: 106.816666"
+                                   readonly>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                            Dapatkan Lokasi Saat Ini
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="clearMarker()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            Hapus Marker
+                        </button>
+                    </div>
+
+                    <div id="map"></div>
+                    <div class="map-hint">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>Klik pada peta untuk menentukan lokasi sekolah</span>
                     </div>
                 </div>
 
@@ -713,11 +911,95 @@
 </div>
 
 <script>
+    // Leaflet Map for Location Picker
+    let map;
+    let marker;
+    let mapInitialized = false;
+
+    // Default coordinates (Indonesia)
+    const defaultLat = {{ $sekolah->latitude ?? '-6.200000' }};
+    const defaultLng = {{ $sekolah->longitude ?? '106.816666' }};
+
+    function initMap() {
+        // Prevent re-initialization
+        if (mapInitialized) {
+            // Just invalidate size in case container was hidden
+            if (map) map.invalidateSize();
+            return;
+        }
+
+        // Check if map container exists
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) {
+            console.log('Map container not found');
+            return;
+        }
+
+        console.log('Initializing map at', defaultLat, defaultLng);
+
+        // Initialize map with existing coordinates or default
+        map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add marker if coordinates exist
+        if (defaultLat && defaultLng) {
+            marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+            marker.bindPopup('Lokasi Sekolah').openPopup();
+
+            // Update input fields when marker is dragged
+            marker.on('dragend', function(event) {
+                var position = marker.getLatLng();
+                document.getElementById('latitude').value = position.lat.toFixed(7);
+                document.getElementById('longitude').value = position.lng.toFixed(7);
+            });
+        }
+
+        // Click on map to set marker
+        map.on('click', function(e) {
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+
+                marker.on('dragend', function(event) {
+                    var position = marker.getLatLng();
+                    document.getElementById('latitude').value = position.lat.toFixed(7);
+                    document.getElementById('longitude').value = position.lng.toFixed(7);
+                });
+            }
+            document.getElementById('latitude').value = e.latlng.lat.toFixed(7);
+            document.getElementById('longitude').value = e.latlng.lng.toFixed(7);
+            marker.bindPopup('Lokasi Sekolah').openPopup();
+        });
+
+        // Force map resize to render correctly
+        setTimeout(function() {
+            if (map) map.invalidateSize();
+        }, 200);
+
+        mapInitialized = true;
+    }
+
     function switchTab(tabName) {
         document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
         event.target.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
+
+        // Initialize or refresh map when Informasi tab is shown
+        if (tabName === 'informasi') {
+            setTimeout(function() {
+                if (!mapInitialized) {
+                    initMap();
+                } else if (map) {
+                    map.invalidateSize();
+                }
+            }, 100);
+        }
     }
 
     function toggleDayFields(day, isActive) {
@@ -746,6 +1028,64 @@
             };
             reader.readAsDataURL(file);
         }
+    });
+
+    // Get current location
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // Update input fields
+                    document.getElementById('latitude').value = lat.toFixed(7);
+                    document.getElementById('longitude').value = lng.toFixed(7);
+
+                    // Initialize map if not already done
+                    if (!mapInitialized) {
+                        initMap();
+                    }
+
+                    // Update map and marker
+                    map.setView([lat, lng], 15);
+                    if (marker) {
+                        marker.setLatLng([lat, lng]);
+                    } else {
+                        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                    }
+                    marker.bindPopup('Lokasi Sekolah').openPopup();
+
+                    // Add drag event listener for new marker
+                    marker.on('dragend', function(event) {
+                        var position = marker.getLatLng();
+                        document.getElementById('latitude').value = position.lat.toFixed(7);
+                        document.getElementById('longitude').value = position.lng.toFixed(7);
+                    });
+                },
+                function(error) {
+                    alert('Gagal mendapatkan lokasi: ' + error.message);
+                }
+            );
+        } else {
+            alert('Browser tidak mendukung geolocation');
+        }
+    }
+
+    // Clear marker
+    function clearMarker() {
+        if (marker && map) {
+            map.removeLayer(marker);
+            marker = null;
+        }
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+    }
+
+    // Initialize map when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delay to ensure all elements are rendered
+        setTimeout(initMap, 300);
     });
 </script>
 @endsection

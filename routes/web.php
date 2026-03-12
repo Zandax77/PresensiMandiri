@@ -11,6 +11,8 @@ use App\Http\Controllers\KendaliUser;
 use App\Http\Controllers\KendaliIzin;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\KendaliSekolah;
+use App\Http\Controllers\KendaliQRCode;
+use App\Http\Controllers\PresensiRecorder;
 use App\Models\Sekolah;
 
 // Apply web middleware to all routes
@@ -74,25 +76,45 @@ Route::middleware('web')->group(function () {
             Route::put('sekolah/jam-presensi', [KendaliSekolah::class, 'updateJamPresensi'])->name('sekolah.jam-presensi.update');
             Route::delete('sekolah/logo', [KendaliSekolah::class, 'removeLogo'])->name('sekolah.remove-logo');
 
-            // Holiday Management Routes
+// Holiday Management Routes
             Route::post('sekolah/libur', [KendaliSekolah::class, 'storeLibur'])->name('sekolah.libur.store');
             Route::post('sekolah/libur/{libur}/toggle', [KendaliSekolah::class, 'toggleLibur'])->name('sekolah.libur.toggle');
             Route::delete('sekolah/libur/{libur}', [KendaliSekolah::class, 'destroyLibur'])->name('sekolah.libur.destroy');
+
+            // QR Code Generation Routes
+            Route::get('qr-code', [KendaliQRCode::class, 'index'])->name('qr-code.index');
+            Route::get('qr-code/generate/{nis}', [KendaliQRCode::class, 'generate'])->name('qr-code.generate');
+            Route::post('qr-code/upload-photo', [KendaliQRCode::class, 'uploadPhoto'])->name('qr-code.upload-photo');
+            Route::post('qr-code/delete-photo', [KendaliQRCode::class, 'deletePhoto'])->name('qr-code.delete-photo');
         });
 
         // Student Management Routes - for wali kelas
         // Wali kelas manages: siswa in their class only
-        Route::middleware('auth')->group(function () {
-            // Check if user is wali_kelas
-            Route::get('wali-kelas/siswa', [KendaliUser::class, 'siswaIndex'])->name('wali-kelas.siswa');
-            Route::get('wali-kelas/presensi', [KendaliUser::class, 'presensiIndex'])->name('wali-kelas.presensi');
-            Route::post('wali-kelas/siswa/{user}/activate', [KendaliUser::class, 'activateSiswa'])->name('wali-kelas.siswa.activate');
-            Route::post('wali-kelas/siswa/{user}/deactivate', [KendaliUser::class, 'deactivateSiswa'])->name('wali-kelas.siswa.deactivate');
-            Route::post('wali-kelas/siswa/{user}/reset-password', [KendaliUser::class, 'resetPasswordSiswa'])->name('wali-kelas.siswa.reset-password');
+        // Check if user is wali_kelas
+        Route::get('wali-kelas/siswa', [KendaliUser::class, 'siswaIndex'])->name('wali-kelas.siswa');
+        Route::get('wali-kelas/presensi', [KendaliUser::class, 'presensiIndex'])->name('wali-kelas.presensi');
+        Route::post('wali-kelas/siswa/{user}/activate', [KendaliUser::class, 'activateSiswa'])->name('wali-kelas.siswa.activate');
+        Route::post('wali-kelas/siswa/{user}/deactivate', [KendaliUser::class, 'deactivateSiswa'])->name('wali-kelas.siswa.deactivate');
+        Route::post('wali-kelas/siswa/{user}/reset-password', [KendaliUser::class, 'resetPasswordSiswa'])->name('wali-kelas.siswa.reset-password');
+        Route::post('wali-kelas/siswa/upload-photo', [KendaliUser::class, 'uploadPhotoSiswa'])->name('wali-kelas.siswa.upload-photo');
+        Route::post('wali-kelas/siswa/delete-photo', [KendaliUser::class, 'deletePhotoSiswa'])->name('wali-kelas.siswa.delete-photo');
 
-            // Rekap Presensi Routes (for both Super Admin and Wali Kelas)
-            Route::get('rekap-presensi', [KendaliUser::class, 'rekapIndex'])->name('rekap-presensi.index');
-            Route::get('rekap-presensi/cetak', [KendaliUser::class, 'rekapCetak'])->name('rekap-presensi.cetak');
+        // Rekap Presensi Routes (for both Super Admin and Wali Kelas)
+        Route::get('rekap-presensi', [KendaliUser::class, 'rekapIndex'])->name('rekap-presensi.index');
+        Route::get('rekap-presensi/cetak', [KendaliUser::class, 'rekapCetak'])->name('rekap-presensi.cetak');
+
+        // Histori Presensi Routes (for both Super Admin and Wali Kelas)
+        Route::get('histori-presensi', [KendaliUser::class, 'historiIndex'])->name('histori-presensi.index');
+        Route::get('histori-presensi/{siswa}', [KendaliUser::class, 'historiDetail'])->name('histori-presensi.detail');
+        Route::get('histori-presensi/{siswa}/cetak', [KendaliUser::class, 'historiCetak'])->name('histori-presensi.cetak');
+
+        // Presensi Recorder Routes (for Wali Kelas and BK to record student attendance)
+        Route::middleware('can:isNotSiswa')->group(function () {
+            Route::get('presensi-recorder', [PresensiRecorder::class, 'index'])->name('presensi-recorder.index');
+            Route::get('presensi-recorder/search', [PresensiRecorder::class, 'search'])->name('presensi-recorder.search');
+            Route::post('presensi-recorder', [PresensiRecorder::class, 'store'])->name('presensi-recorder.store');
+            Route::get('presensi-recorder/get-presensi', [PresensiRecorder::class, 'getPresensi'])->name('presensi-recorder.get-presensi');
+            Route::post('presensi-recorder/reset', [PresensiRecorder::class, 'reset'])->name('presensi-recorder.reset');
         });
 
         // Izin Routes

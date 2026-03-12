@@ -6,6 +6,30 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon $tanggal_mulai
+ * @property string $nama
+ * @property string $jenis
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $tanggal_akhir
+ * @property-read int $hari_count
+ * @property-read string $tanggal_range
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereJenis($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereNama($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereTanggalAkhir($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereTanggalMulai($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Libur whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Libur extends Model
 {
     use HasFactory;
@@ -39,10 +63,13 @@ class Libur extends Model
 
     /**
      * Check if today is a holiday.
+     *
+     * @param \Carbon\Carbon|string|null $tanggal
+     * @return bool
      */
     public static function isHariLibur($tanggal = null): bool
     {
-        $tanggal = $tanggal ?? now()->toDateString();
+        $tanggal = $tanggal ? \Carbon\Carbon::parse($tanggal)->toDateString() : now()->toDateString();
 
         return static::where('is_active', true)
             ->where(function($query) use ($tanggal) {
@@ -57,10 +84,13 @@ class Libur extends Model
 
     /**
      * Get today's holiday if exists.
+     *
+     * @param \Carbon\Carbon|string|null $tanggal
+     * @return \App\Models\Libur|null
      */
     public static function getLiburHariIni($tanggal = null)
     {
-        $tanggal = $tanggal ?? now()->toDateString();
+        $tanggal = $tanggal ? \Carbon\Carbon::parse($tanggal)->toDateString() : now()->toDateString();
 
         return static::where('is_active', true)
             ->where('tanggal_mulai', '<=', $tanggal)

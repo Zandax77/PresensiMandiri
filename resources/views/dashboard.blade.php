@@ -62,7 +62,7 @@
     }
 
     .btn-filter {
-        padding: 0.5rem 1.25rem;
+        padding: 0.5rem 1.5rem; /* slightly wider for better proportion */
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
@@ -70,6 +70,11 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
+        text-decoration: none; /* remove underline for anchors */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 7rem; /* make buttons wider */
     }
 
     .btn-filter:hover {
@@ -281,7 +286,7 @@
             <input type="date" id="tanggal" name="tanggal" class="date-input" value="{{ $tanggal }}">
             <button type="submit" class="btn-filter">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16" style="display: inline; margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-4.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
                 Filter
             </button>
@@ -299,8 +304,8 @@
             <span id="lastUpdated" style="font-size: 0.8125rem; color: #64748b;">
                 Terakhir diperbarui: {{ now()->format('H:i:s') }}
             </span>
-            <button type="button" id="refreshBtn" class="btn-filter" style="padding: 0.375rem 0.75rem; font-size: 0.8125rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14" style="display: inline; margin-right: 4px;">
+            <button type="button" id="refreshBtn" class="btn-filter">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16" style="display: inline; margin-right: 4px;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Refresh

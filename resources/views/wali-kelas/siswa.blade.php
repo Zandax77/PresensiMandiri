@@ -109,6 +109,13 @@
         color: white;
         font-weight: 600;
         font-size: 0.875rem;
+        overflow: hidden;
+    }
+
+    .student-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .student-name {
@@ -119,6 +126,61 @@
     .student-nis {
         font-size: 0.8125rem;
         color: #64748b;
+    }
+
+    /* Photo Column */
+    .photo-cell {
+        width: 80px;
+    }
+
+    .student-photo {
+        position: relative;
+        width: 50px;
+        height: 50px;
+    }
+
+    .photo-thumb {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .photo-placeholder-small {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+    }
+
+    .photo-placeholder-small svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .btn-upload-photo {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-upload-photo:hover {
+        background: #5568d3;
     }
 
     /* Status Badge */
@@ -292,6 +354,88 @@
         background: #d97706;
     }
 
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Photo Upload Modal */
+    .photo-preview-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .photo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-preview svg {
+        width: 48px;
+        height: 48px;
+        color: #94a3b8;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+
+    .help-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+    }
+
+    .modal-footer {
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
     /* Empty State */
     .empty-state {
         text-align: center;
@@ -328,7 +472,9 @@
 
     @media (max-width: 768px) {
         .siswa-table th:nth-child(3),
-        .siswa-table td:nth-child(3) {
+        .siswa-table td:nth-child(3),
+        .siswa-table th:nth-child(4),
+        .siswa-table td:nth-child(4) {
             display: none;
         }
     }
@@ -374,6 +520,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Foto</th>
                         <th>Nama</th>
                         <th>NIS</th>
                         <th>Kelas</th>
@@ -385,11 +532,35 @@
                     @forelse($siswaList as $index => $siswa)
                         <tr>
                             <td>{{ $index + 1 }}</td>
+                            <td class="photo-cell">
+                                <div class="student-photo">
+                                    @if($siswa['foto'])
+                                        <img src="{{ asset('storage/' . $siswa['foto']) }}" alt="Foto {{ $siswa['nama'] }}" class="photo-thumb">
+                                    @else
+                                        <div class="photo-placeholder-small">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    <button class="btn-upload-photo" onclick="openPhotoModal('{{ $siswa['nis'] }}', '{{ $siswa['nama'] }}', '{{ $siswa['foto'] ?? '' }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
                             <td>
                                 <div class="student-info">
-                                    <div class="student-avatar">
-                                        {{ strtoupper(substr($siswa['nama'], 0, 1)) }}
-                                    </div>
+                                    @if($siswa['foto'])
+                                        <div class="student-avatar">
+                                            <img src="{{ asset('storage/' . $siswa['foto']) }}" alt="Foto {{ $siswa['nama'] }}">
+                                        </div>
+                                    @else
+                                        <div class="student-avatar">
+                                            {{ strtoupper(substr($siswa['nama'], 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <div>
                                         <div class="student-name">{{ $siswa['nama'] }}</div>
                                     </div>
@@ -422,7 +593,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -483,6 +654,38 @@
     </div>
 </div>
 
+<!-- Photo Upload Modal -->
+<div id="photoModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title">Upload Foto Siswa</h3>
+        <p id="modalStudentName" class="modal-text"></p>
+
+        <div class="photo-preview-container">
+            <div class="photo-preview" id="photoPreview">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+            </div>
+        </div>
+
+        <form id="photoForm" method="POST" action="{{ route('wali-kelas.siswa.upload-photo') }}" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="nis" id="modalNis">
+
+            <div class="form-group">
+                <label for="foto">Pilih Foto</label>
+                <input type="file" name="foto" id="foto" accept="image/*" required>
+                <p class="help-text">Format: JPEG, PNG, JPG, GIF. Maksimal 2MB.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closePhotoModal()">Batal</button>
+                <button type="submit" class="btn btn-primary">Upload Foto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function showActivateModal(studentId, studentName) {
         document.getElementById('activateStudentName').textContent = studentName;
@@ -504,6 +707,25 @@
 
     function closeModal(modalId) {
         document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Photo Modal Functions
+    function openPhotoModal(nis, nama, foto) {
+        document.getElementById('modalNis').value = nis;
+        document.getElementById('modalStudentName').textContent = 'Upload foto untuk: ' + nama;
+
+        const preview = document.getElementById('photoPreview');
+        if (foto) {
+            preview.innerHTML = '<img src="/storage/' + foto + '" alt="Foto">';
+        } else {
+            preview.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>';
+        }
+
+        document.getElementById('photoModal').classList.add('show');
+    }
+
+    function closePhotoModal() {
+        document.getElementById('photoModal').classList.remove('show');
     }
 
     // Close modal when clicking outside

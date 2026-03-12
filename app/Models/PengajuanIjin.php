@@ -5,6 +5,43 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon $tanggal_awal
+ * @property \Illuminate\Support\Carbon $tanggal_akhir
+ * @property string $jenis_izin
+ * @property string $alasan
+ * @property string $status
+ * @property int|null $approved_by
+ * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property string|null $catatan
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $berkas
+ * @property-read \App\Models\User|null $approver
+ * @property-read int $durasi
+ * @property-read string $jenis_izin_label
+ * @property-read string $status_label
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereAlasan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereApprovedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereBerkas($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereCatatan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereJenisIzin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereTanggalAkhir($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereTanggalAwal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PengajuanIjin whereUserId($value)
+ * @mixin \Eloquent
+ */
 class PengajuanIjin extends Model
 {
     /**

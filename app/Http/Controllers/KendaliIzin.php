@@ -19,6 +19,13 @@ class KendaliIzin extends Controller
         $user = Auth::user();
         $status = $request->get('status', 'menunggu');
 
+        // clear related notifications
+        if ($user->isWaliKelas() || $user->isSuperAdmin() || $user->isBK()) {
+            $user->unreadNotifications()
+                ->where('type', \App\Notifications\IzinDiajukan::class)
+                ->update(['read_at' => now()]);
+        }
+
         // Build query based on user role
         $query = PengajuanIjin::with(['user', 'approver']);
 
@@ -127,7 +134,7 @@ class KendaliIzin extends Controller
             $berkasPath = $file->storeAs('private/izin', $fileName);
         }
 
-        PengajuanIjin::create([
+        $pengajuan = PengajuanIjin::create([
             'user_id' => $user->id,
             'jenis_izin' => $request->jenis_izin,
             'tanggal_awal' => $request->tanggal_awal,
@@ -136,6 +143,20 @@ class KendaliIzin extends Controller
             'berkas' => $berkasPath,
             'status' => 'menunggu',
         ]);
+
+        // notify wali kelas of this student's class
+        $siswaData = Siswa::where('user_id', $user->id)->first();
+        if ($siswaData && $siswaData->kelas) {
+            $waliUsers = \App\Models\User::where('role', 'wali_kelas')
+                ->where('kelas', $siswaData->kelas)
+                ->get();
+            if ($waliUsers->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send(
+                    $waliUsers,
+                    new \App\Notifications\IzinDiajukan($pengajuan)
+                );
+            }
+        }
 
         return redirect()->route('izin.saya')->with('success', 'Pengajuan ijin berhasil dikirim! Menunggu persetujuan.');
     }

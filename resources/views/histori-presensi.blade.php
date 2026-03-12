@@ -1,10 +1,10 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Rekap Presensi')
+@section('title', 'Histori Presensi')
 
 @section('styles')
 <style>
-    .rekap-container {
+    .histori-container {
         padding: 1.5rem;
         max-width: 1600px;
         margin: 0 auto;
@@ -93,69 +93,6 @@
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
-    .btn-cetak {
-        padding: 0.625rem 1.25rem;
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-    }
-
-    .btn-cetak:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-    }
-
-    /* Stats Cards */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 1.25rem;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-    }
-
-    .stat-card-title {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #64748b;
-    }
-
-    .stat-card-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .stat-card-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
     /* Table */
     .table-card {
         background: white;
@@ -168,19 +105,19 @@
         overflow-x: auto;
     }
 
-    .rekap-table {
+    .histori-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .rekap-table th,
-    .rekap-table td {
+    .histori-table th,
+    .histori-table td {
         padding: 0.875rem 1rem;
         text-align: left;
         border-bottom: 1px solid #e2e8f0;
     }
 
-    .rekap-table th {
+    .histori-table th {
         background: #f8fafc;
         font-weight: 600;
         color: #64748b;
@@ -189,11 +126,11 @@
         letter-spacing: 0.05em;
     }
 
-    .rekap-table tbody tr:hover {
+    .histori-table tbody tr:hover {
         background: #f8fafc;
     }
 
-    .rekap-table tbody tr:last-child td {
+    .histori-table tbody tr:last-child td {
         border-bottom: none;
     }
 
@@ -293,6 +230,46 @@
         font-size: 0.9375rem;
     }
 
+    /* Action Button */
+    .btn-detail {
+        padding: 0.375rem 0.75rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .btn-detail:hover {
+        background: #5568d3;
+    }
+
+    .btn-cetak-inline {
+        padding: 0.375rem 0.75rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-cetak-inline:hover {
+        background: #0ea57f;
+    }
+
     @media (max-width: 768px) {
         .filter-form {
             flex-direction: column;
@@ -303,7 +280,7 @@
             width: 100%;
         }
 
-        .btn-filter, .btn-cetak {
+        .btn-filter {
             width: 100%;
             justify-content: center;
         }
@@ -317,17 +294,17 @@
 @endsection
 
 @section('content')
-<div class="rekap-container">
+<div class="histori-container">
     <div class="page-header">
         <div>
-            <h1 class="page-title">Rekap Presensi</h1>
-            <p class="page-subtitle">Laporan rekapitulasi kehadiran siswa dalam periode tertentu</p>
+            <h1 class="page-title">Histori Presensi</h1>
+            <p class="page-subtitle">Riwayat kehadiran siswa dalam periode tertentu</p>
         </div>
     </div>
 
     <!-- Filter Section -->
     <div class="filter-section">
-        <form method="GET" action="{{ route('rekap-presensi.index') }}" class="filter-form">
+        <form method="GET" action="{{ route('histori-presensi.index') }}" class="filter-form">
             <div class="filter-group">
                 <label for="tanggal_mulai" class="filter-label">Tanggal Mulai</label>
                 <input type="date" id="tanggal_mulai" name="tanggal_mulai" class="filter-input" value="{{ $tanggalMulai }}">
@@ -357,19 +334,13 @@
             </div>
             @endif
 
-            <div class="filter-group" style="flex-direction: row; gap: 0.5rem;">
+            <div class="filter-group">
                 <button type="submit" class="btn-filter">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
                     Filter
                 </button>
-                <a href="{{ route('rekap-presensi.cetak', ['tanggal_mulai' => $tanggalMulai, 'tanggal_akhir' => $tanggalAkhir, 'kelas' => $kelasDipilih]) }}" target="_blank" class="btn-cetak">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Cetak
-                </a>
             </div>
         </form>
     </div>
@@ -378,97 +349,20 @@
     <div class="info-card">
         <div class="info-card-title">
             @if($kelasDipilih)
-                Rekap Presensi Kelas {{ $kelasDipilih }}
+                Histori Presensi Kelas {{ $kelasDipilih }}
             @else
-                Rekap Presensi Semua Kelas
+                Histori Presensi Semua Kelas
             @endif
         </div>
         <div class="info-card-text">
             Periode: {{ \Carbon\Carbon::parse($tanggalMulai)->format('d F Y') }} - {{ \Carbon\Carbon::parse($tanggalAkhir)->format('d F Y') }}
-            <br>
-            Total Hari: {{ count($dateRange) }} hari
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Total Siswa</span>
-                <div class="stat-card-icon" style="background: #dbeafe;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#1e40af" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value">{{ count($rekapData) }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Total Hadir</span>
-                <div class="stat-card-icon" style="background: #dcfce7;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#166534" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value" style="color: #166534;">{{ $overallStats['total_hadir'] }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Total Izin</span>
-                <div class="stat-card-icon" style="background: #dbeafe;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#1e40af" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value" style="color: #1e40af;">{{ $overallStats['total_izin'] }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Total Sakit</span>
-                <div class="stat-card-icon" style="background: #fee2e2;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#991b1b" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value" style="color: #991b1b;">{{ $overallStats['total_sakit'] }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Total Alfa</span>
-                <div class="stat-card-icon" style="background: #f1f5f9;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#475569" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value" style="color: #475569;">{{ $overallStats['total_alfa'] }}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span class="stat-card-title">Persentase Hadir</span>
-                <div class="stat-card-icon" style="background: #fef3c7;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#b45309" width="20" height="20">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-card-value" style="color: #b45309;">{{ $overallStats['persentase_hadir'] }}%</div>
         </div>
     </div>
 
     <!-- Table Section -->
     <div class="table-card">
         <div class="table-responsive">
-            <table class="rekap-table">
+            <table class="histori-table">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -480,10 +374,11 @@
                         <th>Sakit</th>
                         <th>Alfa</th>
                         <th>Persentase</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($rekapData as $index => $data)
+                    @forelse($siswaData as $index => $data)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>
@@ -513,15 +408,29 @@
                                     <span style="font-size: 0.8125rem; color: #64748b;">{{ $data['persentase_hadir'] }}%</span>
                                 </div>
                             </td>
+                            <td>
+                                <a href="{{ route('histori-presensi.detail', ['siswa' => $data['user_id'], 'tanggal_mulai' => $tanggalMulai, 'tanggal_akhir' => $tanggalAkhir]) }}" class="btn-detail">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Detail
+                                </a>
+                                <a href="{{ route('histori-presensi.cetak', ['siswa' => $data['user_id'], 'tanggal_mulai' => $tanggalMulai, 'tanggal_akhir' => $tanggalAkhir]) }}" target="_blank" class="btn-cetak-inline" style="margin-left:0.5rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V2h12v7M6 22h12v-7M6 15h12" />
+                                    </svg>
+                                </a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9">
+                            <td colspan="10">
                                 <div class="empty-state">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
-                                    <p>Tidak ada data presensi dalam periode ini.</p>
+                                    <p>Tidak ada data siswa dalam periode ini.</p>
                                 </div>
                             </td>
                         </tr>
