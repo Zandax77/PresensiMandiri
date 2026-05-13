@@ -364,23 +364,31 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <div class="mobile-logo">Presensi Mandiri</div>
+            <div class="mobile-logo">{{ \App\Models\Sekolah::getSekolah()->nama ?? 'Presensi Mandiri' }}</div>
             <div style="width: 40px;"></div>
         </div>
 
         <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
+        @php
+            $sekolah = \App\Models\Sekolah::getSekolah();
+        @endphp
+
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="{{ auth()->user()->isSiswa() ? route('presensi.index') : route('dashboard') }}" class="sidebar-logo" style="text-decoration: none; color: inherit;">
                     <div class="sidebar-logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="24" height="24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                        @if($sekolah && $sekolah->logo_url)
+                            <img src="{{ $sekolah->logo_url }}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="24" height="24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        @endif
                     </div>
-                    <span class="sidebar-logo-text">Presensi<br>Mandiri</span>
+                    <span class="sidebar-logo-text" style="font-size: 1rem;">{!! nl2br(e($sekolah->nama ?? 'Presensi\nMandiri')) !!}</span>
                 </a>
                 <div class="sidebar-user">
                     <div class="sidebar-user-name">{{ auth()->user()->name }}</div>

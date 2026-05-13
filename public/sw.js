@@ -1,13 +1,12 @@
-const CACHE_NAME = 'presensi-mandiri-v1';
+const CACHE_NAME = 'presensi-mandiri-v2';
 const urlsToCache = [
-    '/',
-    '/login',
     '/manifest.json',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -17,20 +16,37 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+    // Only handle GET requests
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
+    // Network First strategy for HTML pages to prevent CSRF token issues (419 errors)
+    if (event.request.mode === 'navigate' || event.request.headers.get('accept').includes('text/html')) {
+        event.respondWith(
+            fetch(event.request)
+                .catch(() => {
+                    // Fallback to cache if offline
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    // Cache First strategy for other assets (images, css, js)
     event.respondWith(
         caches.match(event.request)
             .then(response => {
                 if (response) {
                     return response;
                 }
-                return fetch(event.request).catch(() => {
-                    // Fallback for offline pages could go here
-                });
+                return fetch(event.request);
             })
     );
 });
 
 self.addEventListener('activate', event => {
+    event.waitUntil(self.clients.claim());
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
         caches.keys().then(cacheNames => {
