@@ -81,6 +81,12 @@ Route::middleware('web')->group(function () {
             Route::post('sekolah/libur/{libur}/toggle', [KendaliSekolah::class, 'toggleLibur'])->name('sekolah.libur.toggle');
             Route::delete('sekolah/libur/{libur}', [KendaliSekolah::class, 'destroyLibur'])->name('sekolah.libur.destroy');
 
+            // Student Management Routes - Master List for Admin
+            Route::get('admin/siswa', [KendaliUser::class, 'siswaMasterIndex'])->name('admin.siswa.index');
+            Route::get('admin/siswa/template', [KendaliUser::class, 'downloadTemplate'])->name('admin.siswa.template');
+            Route::post('admin/siswa/import', [KendaliUser::class, 'importSiswa'])->name('admin.siswa.import');
+            Route::delete('admin/siswa/{user}/delete', [KendaliUser::class, 'destroySiswa'])->name('admin.siswa.destroy');
+
             // QR Code Generation Routes
             Route::get('qr-code', [KendaliQRCode::class, 'index'])->name('qr-code.index');
             Route::get('qr-code/generate/{nis}', [KendaliQRCode::class, 'generate'])->name('qr-code.generate');

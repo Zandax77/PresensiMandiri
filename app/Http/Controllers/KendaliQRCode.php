@@ -22,7 +22,7 @@ class KendaliQRCode extends Controller
         }
 
         // Get filter parameters
-        $kelasDipilih = $request->get('kelas', '');
+        $kelasDipilih = $request->input('kelas', '');
 
         // Get available classes
         $availableClasses = User::getAvailableClasses();

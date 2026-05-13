@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define Gate for Super Admin (kesiswaan)
+        // Define Gate for Super Admin
         Gate::define('isSuperAdmin', function ($user) {
             return $user->isSuperAdmin();
         });
@@ -29,5 +32,22 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('isNotSiswa', function ($user) {
             return !$user->isSiswa();
         });
+
+        // Automatically create Super Admin if database is empty or no super admin exists
+        try {
+            if (Schema::hasTable('users')) {
+                if (User::where('role', 'super_admin')->count() === 0) {
+                    User::create([
+                        'name' => 'Super Admin',
+                        'email' => 'admin@presensi.com',
+                        'password' => Hash::make('admin123'),
+                        'role' => 'super_admin',
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail if DB is not ready or other issues occur during boot
+        }
     }
 }

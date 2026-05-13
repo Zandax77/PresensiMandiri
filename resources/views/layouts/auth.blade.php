@@ -7,14 +7,14 @@
     <title>{{ config('app.name', 'Presensi Mandiri') }} - @yield('title', 'Login')</title>
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#1e293b">
     <meta name="description" content="Aplikasi Presensi Mandiri untuk Siswa">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Presensi">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Presensi Mandiri">
-    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-TileColor" content="#1e293b">
     <meta name="msapplication-tap-highlight" content="no">
 
     <!-- PWA Manifest -->
@@ -22,14 +22,6 @@
 
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('icons/icon-72x72.png') }}">
-    <link rel="apple-touch-icon" sizes="96x96" href="{{ asset('icons/icon-96x96.png') }}">
-    <link rel="apple-touch-icon" sizes="128x128" href="{{ asset('icons/icon-128x128.png') }}">
-    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('icons/icon-144x144.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('icons/icon-152x152.png') }}">
-    <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('icons/icon-192x192.png') }}">
-    <link rel="apple-touch-icon" sizes="384x384" href="{{ asset('icons/icon-384x384.png') }}">
-    <link rel="apple-touch-icon" sizes="512x512" href="{{ asset('icons/icon-512x512.png') }}">
 
     <!-- Apple Startup Screen -->
     <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="{{ asset('icons/icon-1125x2436.png') }}">
@@ -107,14 +99,14 @@
             .login-logo {
                 width: 64px;
                 height: 64px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: transparent;
                 border-radius: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 margin: 0 auto 1rem;
                 font-size: 1.75rem;
-                color: white;
+                color: #667eea;
                 font-weight: 700;
                 overflow: hidden;
             }
@@ -357,6 +349,18 @@
     @yield('content')
 
     @stack('scripts')
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
 

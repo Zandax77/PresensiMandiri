@@ -6,6 +6,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Presensi Mandiri') }} - @yield('title', 'Dashboard')</title>
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e293b">
+    <meta name="description" content="Aplikasi Presensi Mandiri">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Presensi">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Presensi Mandiri">
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
@@ -64,7 +77,7 @@
             .sidebar-logo-icon {
                 width: 40px;
                 height: 40px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: transparent;
                 border-radius: 10px;
                 display: flex;
                 align-items: center;
@@ -361,14 +374,14 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">
+                <a href="{{ auth()->user()->isSiswa() ? route('presensi.index') : route('dashboard') }}" class="sidebar-logo" style="text-decoration: none; color: inherit;">
                     <div class="sidebar-logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" width="24" height="24">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="24" height="24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <span class="sidebar-logo-text">Presensi<br>Mandiri</span>
-                </div>
+                </a>
                 <div class="sidebar-user">
                     <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
                     <div class="sidebar-user-role">{{ auth()->user()->getRoleLabelAttribute() }}</div>
@@ -442,6 +455,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         Kelola User
+                    </a>
+
+                    <a href="{{ route('admin.siswa.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.siswa.index') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Kelola Siswa
                     </a>
 
                     <a href="{{ route('rekap-presensi.index') }}" class="sidebar-nav-item {{ request()->routeIs('rekap-presensi.index') ? 'active' : '' }}">
@@ -591,6 +611,17 @@
                 }
             }
         });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
     </script>
 
     @yield('scripts')

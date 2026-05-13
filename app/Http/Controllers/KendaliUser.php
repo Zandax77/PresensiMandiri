@@ -20,19 +20,31 @@ class KendaliUser extends Controller
      * Display a list of non-siswa users (super admin only).
      * Super admin manages: super_admin, wali_kelas, bk, kesiswaan
      */
-    public function index()
+    public function index(Request $request)
     {
         // Only kesiswaan (super admin) can access user management
         if (!auth()->user()->isSuperAdmin()) {
             abort(403, 'Unauthorized access.');
         }
 
-        // Only show non-siswa users (super_admin, wali_kelas, bk, kesiswaan)
-        $users = User::where('role', '!=', 'siswa')
-            ->orderBy('created_at', 'desc')
+        $search = $request->input('search');
+
+        // Show all users (super_admin, wali_kelas, bk, kesiswaan, AND siswa)
+        $query = User::query();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('role', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('role')
+            ->orderBy('name')
             ->get();
 
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'search'));
     }
 
     /**
@@ -73,14 +85,9 @@ class KendaliUser extends Controller
     {
         $authUser = auth()->user();
 
-        // Only super admin can activate non-siswa accounts
+        // Only super admin can activate accounts
         if (!$authUser->isSuperAdmin()) {
             abort(403, 'Unauthorized access.');
-        }
-
-        // Only allow activating non-siswa accounts
-        if ($user->role === 'siswa') {
-            abort(403, 'Super admin tidak dapat mengelola akun siswa. Hubungi wali kelas yang bersangkutan.');
         }
 
         // Update is_active to true (1)
@@ -97,14 +104,9 @@ class KendaliUser extends Controller
     {
         $authUser = auth()->user();
 
-        // Only super admin can deactivate non-siswa accounts
+        // Only super admin can deactivate accounts
         if (!$authUser->isSuperAdmin()) {
             abort(403, 'Unauthorized access.');
-        }
-
-        // Only allow deactivating non-siswa accounts
-        if ($user->role === 'siswa') {
-            abort(403, 'Super admin tidak dapat mengelola akun siswa. Hubungi wali kelas yang bersangkutan.');
         }
 
         // Prevent deactivating self
@@ -126,14 +128,9 @@ class KendaliUser extends Controller
     {
         $authUser = auth()->user();
 
-        // Only super admin can reset password for non-siswa accounts
+        // Only super admin can reset password
         if (!$authUser->isSuperAdmin()) {
             abort(403, 'Unauthorized access.');
-        }
-
-        // Only allow resetting password for non-siswa accounts
-        if ($user->role === 'siswa') {
-            abort(403, 'Super admin tidak dapat mengelola akun siswa. Hubungi wali kelas yang bersangkutan.');
         }
 
         // Reset password to default 12345678
@@ -154,11 +151,6 @@ class KendaliUser extends Controller
         // Only super admin can delete accounts
         if (!$authUser->isSuperAdmin()) {
             abort(403, 'Unauthorized access.');
-        }
-
-        // Only allow deleting non-siswa accounts
-        if ($user->role === 'siswa') {
-            abort(403, 'Super admin tidak dapat menghapus akun siswa. Hubungi wali kelas yang bersangkutan.');
         }
 
         // Prevent deleting self
@@ -292,7 +284,7 @@ class KendaliUser extends Controller
         }
 
         // Get selected date (default: today)
-$tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString());
+$tanggal = $request->input('tanggal', Carbon::today('Asia/Jakarta')->toDateString());
 
         // Ensure $tanggal is a Carbon instance for proper date comparison
         $tanggalCarbon = $tanggal instanceof Carbon ? $tanggal : Carbon::parse($tanggal);
@@ -388,9 +380,9 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
         }
 
         // Get filter parameters
-        $tanggalMulai = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->get('tanggal_akhir', Carbon::now()->toDateString());
-        $kelasDipilih = $request->get('kelas', $user->isWaliKelas() ? $user->kelas : '');
+        $tanggalMulai = $request->input('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', Carbon::now()->toDateString());
+        $kelasDipilih = $request->input('kelas', $user->isWaliKelas() ? $user->kelas : '');
 
         // Get available classes
         $availableClasses = User::getAvailableClasses();
@@ -534,9 +526,9 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
         }
 
         // Get filter parameters
-        $tanggalMulai = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->get('tanggal_akhir', Carbon::now()->toDateString());
-        $kelasDipilih = $request->get('kelas', $user->isWaliKelas() ? $user->kelas : '');
+        $tanggalMulai = $request->input('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', Carbon::now()->toDateString());
+        $kelasDipilih = $request->input('kelas', $user->isWaliKelas() ? $user->kelas : '');
 
         // Get available classes
         $availableClasses = User::getAvailableClasses();
@@ -686,9 +678,9 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
         }
 
         // Get filter parameters
-        $tanggalMulai = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->get('tanggal_akhir', Carbon::now()->toDateString());
-        $kelasDipilih = $request->get('kelas', $user->isWaliKelas() ? $user->kelas : '');
+        $tanggalMulai = $request->input('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', Carbon::now()->toDateString());
+        $kelasDipilih = $request->input('kelas', $user->isWaliKelas() ? $user->kelas : '');
 
         // Get available classes
         $availableClasses = User::getAvailableClasses();
@@ -764,112 +756,57 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
     {
         $user = auth()->user();
 
-        // Only Super Admin, BK, and Wali Kelas can access
         if (!$user->isSuperAdmin() && !$user->isWaliKelas() && !$user->isBK()) {
             abort(403, 'Unauthorized access.');
         }
 
-        // Get filter parameters
-        $tanggalMulai = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->get('tanggal_akhir', Carbon::now()->toDateString());
+        $tanggalMulai = $request->input('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', Carbon::now()->toDateString());
 
-        // Get student data
         $siswaData = Siswa::with('user')->where('user_id', $siswa)->first();
-
         if (!$siswaData) {
             abort(404, 'Siswa tidak ditemukan.');
         }
 
-        // Get student's name (from siswa table or user table)
         $siswaName = $siswaData->nama ?? ($siswaData->user->name ?? 'Siswa');
 
-        // If user is wali kelas, check if student is in their class
         if ($user->isWaliKelas() && $siswaData->kelas !== $user->kelas) {
             abort(403, 'Anda hanya dapat melihat histori presensi siswa di kelas Anda.');
         }
 
-        // Get all dates in range
-        $tanggalMulaiCarbon = Carbon::parse($tanggalMulai);
-        $tanggalAkhirCarbon = Carbon::parse($tanggalAkhir);
-        $dateRange = [];
-        $current = $tanggalMulaiCarbon->copy();
-        while ($current->lte($tanggalAkhirCarbon)) {
-            $dayOfWeek = $current->dayOfWeek;
-            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
-                if (!Libur::isHariLibur($current->toDateString())) {
-                    $dateRange[] = $current->copy();
-                }
-            }
-            $current->addDay();
-        }
+        // Use helper to get filtered date range
+        $dateRange = $this->generateSchoolDateRange($tanggalMulai, $tanggalAkhir);
 
-        // Get presensi records
+        // Get presensi records indexed by date
         $presensis = Presensi::where('user_id', $siswa)
             ->whereBetween('tanggal', [$tanggalMulai, $tanggalAkhir])
-            ->orderBy('tanggal', 'desc')
             ->get()
             ->keyBy('tanggal');
 
-        // Build detail data for each date
         $historiData = [];
         foreach ($dateRange as $tanggal) {
             $tanggalStr = $tanggal->toDateString();
-            $presensi = $presensis->get($tanggalStr);
-
-            // Check for approved izin/sakit
+            
+            // Check for approved izin/sakit for this specific date
             $izinRequest = PengajuanIjin::where('user_id', $siswa)
                 ->where('status', 'diterima')
-                ->whereDate('tanggal_awal', '<=', $tanggal)
-                ->whereDate('tanggal_akhir', '>=', $tanggal)
+                ->whereDate('tanggal_awal', '<=', $tanggalStr)
+                ->whereDate('tanggal_akhir', '>=', $tanggalStr)
                 ->first();
 
-            // Determine status
-            $status = null;
-            $keterangan = null;
-            if ($presensi) {
-                $status = $presensi->status;
-                $keterangan = $presensi->keterangan;
-            } elseif ($izinRequest) {
-                $status = $izinRequest->jenis_izin;
-                $keterangan = $izinRequest->alasan;
-            } else {
-                $status = 'alfa';
-            }
+            $statusInfo = $this->resolveAttendanceStatus($presensis->get($tanggalStr), $izinRequest);
 
-            $historiData[] = [
+            $historiData[] = array_merge([
                 'tanggal' => $tanggalStr,
                 'tanggal_formatted' => $tanggal->format('d/m/Y'),
                 'hari' => $tanggal->locale('id')->dayName,
-                'status' => $status,
-                'jam_datang' => $presensi ? $presensi->jam_datang : null,
-                'jam_pulang' => $presensi ? $presensi->jam_pulang : null,
-                'keterangan' => $keterangan,
-            ];
+            ], $statusInfo);
         }
 
-        // Calculate statistics
-        $totalHadir = collect($historiData)->where('status', 'hadir')->count();
-        $totalIzin = collect($historiData)->where('status', 'izin')->count();
-        $totalSakit = collect($historiData)->where('status', 'sakit')->count();
-        $totalAlfa = collect($historiData)->where('status', 'alfa')->count();
-        $totalHari = count($historiData);
-
-        $stats = [
-            'hadir' => $totalHadir,
-            'izin' => $totalIzin,
-            'sakit' => $totalSakit,
-            'alfa' => $totalAlfa,
-            'total_hari' => $totalHari,
-            'persentase_hadir' => $totalHari > 0 ? round(($totalHadir / $totalHari) * 100, 1) : 0,
-        ];
+        $stats = $this->calculateAttendanceStats($historiData);
 
         return view('histori-presensi-detail', compact(
-            'siswaData',
-            'siswaName',
-            'historiData',
-            'stats',
-            'tanggalMulai',
-            'tanggalAkhir'
+            'siswaData', 'siswaName', 'historiData', 'stats', 'tanggalMulai', 'tanggalAkhir'
         ));
     }
 
@@ -880,104 +817,58 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
     {
         $user = auth()->user();
 
-        // Only Super Admin, BK, Wali Kelas
         if (!$user->isSuperAdmin() && !$user->isWaliKelas() && !$user->isBK()) {
             abort(403, 'Unauthorized access.');
         }
 
-        // get parameters same as detail
-        $tanggalMulai = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalAkhir = $request->get('tanggal_akhir', Carbon::now()->toDateString());
+        $tanggalMulai = $request->input('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+        $tanggalAkhir = $request->input('tanggal_akhir', Carbon::now()->toDateString());
 
         $siswaData = Siswa::with('user')->where('user_id', $siswa)->first();
         if (!$siswaData) {
             abort(404, 'Siswa tidak ditemukan.');
         }
+
         if ($user->isWaliKelas() && $siswaData->kelas !== $user->kelas) {
             abort(403, 'Anda hanya dapat melihat histori presensi siswa di kelas Anda.');
         }
+
         $siswaName = $siswaData->nama ?? ($siswaData->user->name ?? 'Siswa');
 
-        // build date range
-        $tanggalMulaiCarbon = Carbon::parse($tanggalMulai);
-        $tanggalAkhirCarbon = Carbon::parse($tanggalAkhir);
-        $dateRange = [];
-        $current = $tanggalMulaiCarbon->copy();
-        while ($current->lte($tanggalAkhirCarbon)) {
-            $dayOfWeek = $current->dayOfWeek;
-            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
-                if (!Libur::isHariLibur($current->toDateString())) {
-                    $dateRange[] = $current->copy();
-                }
-            }
-            $current->addDay();
-        }
+        // Use helper to get filtered date range
+        $dateRange = $this->generateSchoolDateRange($tanggalMulai, $tanggalAkhir);
 
+        // Get presensi records indexed by date
         $presensis = Presensi::where('user_id', $siswa)
             ->whereBetween('tanggal', [$tanggalMulai, $tanggalAkhir])
-            ->orderBy('tanggal', 'desc')
             ->get()
             ->keyBy('tanggal');
 
         $historiData = [];
         foreach ($dateRange as $tanggal) {
             $tanggalStr = $tanggal->toDateString();
-            $presensi = $presensis->get($tanggalStr);
+            
+            // Check for approved izin/sakit for this specific date
             $izinRequest = PengajuanIjin::where('user_id', $siswa)
                 ->where('status', 'diterima')
-                ->whereDate('tanggal_awal', '<=', $tanggal)
-                ->whereDate('tanggal_akhir', '>=', $tanggal)
+                ->whereDate('tanggal_awal', '<=', $tanggalStr)
+                ->whereDate('tanggal_akhir', '>=', $tanggalStr)
                 ->first();
 
-            $status = null;
-            $keterangan = null;
-            if ($presensi) {
-                $status = $presensi->status;
-                $keterangan = $presensi->keterangan;
-            } elseif ($izinRequest) {
-                $status = $izinRequest->jenis_izin;
-                $keterangan = $izinRequest->alasan;
-            } else {
-                $status = 'alfa';
-            }
+            $statusInfo = $this->resolveAttendanceStatus($presensis->get($tanggalStr), $izinRequest);
 
-            $historiData[] = [
+            $historiData[] = array_merge([
                 'tanggal' => $tanggalStr,
                 'tanggal_formatted' => $tanggal->format('d/m/Y'),
                 'hari' => $tanggal->locale('id')->dayName,
-                'status' => $status,
-                'jam_datang' => $presensi ? $presensi->jam_datang : null,
-                'jam_pulang' => $presensi ? $presensi->jam_pulang : null,
-                'keterangan' => $keterangan,
-            ];
+            ], $statusInfo);
         }
 
-        // stats calculations
-        $totalHadir = collect($historiData)->where('status', 'hadir')->count();
-        $totalIzin = collect($historiData)->where('status', 'izin')->count();
-        $totalSakit = collect($historiData)->where('status', 'sakit')->count();
-        $totalAlfa = collect($historiData)->where('status', 'alfa')->count();
-        $totalHari = count($historiData);
-
-        $stats = [
-            'hadir' => $totalHadir,
-            'izin' => $totalIzin,
-            'sakit' => $totalSakit,
-            'alfa' => $totalAlfa,
-            'total_hari' => $totalHari,
-            'persentase_hadir' => $totalHari > 0 ? round(($totalHadir / $totalHari) * 100, 1) : 0,
-        ];
-
+        $stats = $this->calculateAttendanceStats($historiData);
         $sekolah = Sekolah::getSekolah();
 
         return view('histori-presensi-detail-cetak', compact(
-            'siswaData',
-            'siswaName',
-            'historiData',
-            'stats',
-            'tanggalMulai',
-            'tanggalAkhir',
-            'sekolah'
+            'siswaData', 'siswaName', 'historiData', 'stats', 'tanggalMulai', 'tanggalAkhir', 'sekolah'
         ));
     }
 
@@ -1054,6 +945,230 @@ $tanggal = $request->get('tanggal', Carbon::today('Asia/Jakarta')->toDateString(
         }
 
         return redirect()->route('wali-kelas.siswa')->with('error', 'Tidak ada foto untuk dihapus.');
+    }
+
+    /**
+     * Master student list for Admin.
+     */
+    public function siswaMasterIndex(Request $request)
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $kelasDipilih = $request->input('kelas', '');
+        $availableClasses = User::getAvailableClasses();
+
+        $query = Siswa::with('user');
+        if ($kelasDipilih) {
+            $query->where('kelas', $kelasDipilih);
+        }
+
+        $siswaList = $query->orderBy('kelas')->orderBy('nis')->get();
+
+        return view('admin.siswa', compact('siswaList', 'availableClasses', 'kelasDipilih'));
+    }
+
+    /**
+     * Download CSV template for student import.
+     */
+    public function downloadTemplate()
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template_impor_siswa.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['nis', 'nama', 'kelas']);
+            // Sample row
+            fputcsv($file, ['12345678', 'Contoh Siswa', 'X RPL 1']);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Import students from CSV.
+     */
+    public function importSiswa(Request $request)
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $request->validate([
+            'file' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        $handle = fopen($file->getRealPath(), 'r');
+        
+        // Skip header
+        fgetcsv($handle);
+
+        $imported = 0;
+        $errors = [];
+        $rowNum = 2;
+
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            if (count($data) < 3) {
+                $errors[] = "Baris $rowNum: Format tidak valid (kurang kolom).";
+                $rowNum++;
+                continue;
+            }
+
+            $nis = trim($data[0]);
+            $nama = trim($data[1]);
+            $kelas = trim($data[2]);
+
+            if (empty($nis) || empty($nama) || empty($kelas)) {
+                $errors[] = "Baris $rowNum: NIS, Nama, dan Kelas tidak boleh kosong.";
+                $rowNum++;
+                continue;
+            }
+
+            // Check if NIS already exists in Siswa
+            if (Siswa::where('nis', $nis)->exists()) {
+                $errors[] = "Baris $rowNum: NIS $nis sudah terdaftar.";
+                $rowNum++;
+                continue;
+            }
+
+            // Create User
+            $user = User::create([
+                'name' => $nama,
+                'email' => $nis, // NIS as email for login
+                'password' => Hash::make($nis), // NIS as password
+                'role' => 'siswa',
+                'is_active' => true,
+            ]);
+
+            // Create Siswa
+            Siswa::create([
+                'user_id' => $user->id,
+                'nis' => $nis,
+                'nama' => $nama,
+                'kelas' => $kelas,
+            ]);
+
+            $imported++;
+            $rowNum++;
+        }
+
+        fclose($handle);
+
+        $message = "Berhasil mengimpor $imported siswa.";
+        if (!empty($errors)) {
+            return redirect()->back()->with('success', $message)->with('import_errors', $errors);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Delete a student account (for super admin only).
+     */
+    public function destroySiswa(User $user)
+    {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if ($user->role !== 'siswa') {
+            abort(403, 'Anda hanya dapat menghapus akun siswa di sini.');
+        }
+
+        $siswa = $user->siswa;
+        if ($siswa && $siswa->foto && Storage::exists('public/' . $siswa->foto)) {
+            Storage::delete('public/' . $siswa->foto);
+        }
+
+        $user->delete();
+
+        return redirect()->back()->with('success', 'Data siswa berhasil dihapus.');
+    }
+
+    /**
+     * Generate school date range (excluding weekends and holidays).
+     */
+    private function generateSchoolDateRange(string $start, string $end): array
+    {
+        $startCarbon = Carbon::parse($start);
+        $endCarbon = Carbon::parse($end);
+        $dateRange = [];
+        $current = $startCarbon->copy();
+
+        while ($current->lte($endCarbon)) {
+            $dayOfWeek = $current->dayOfWeek;
+            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) { // Not Sat/Sun
+                if (!Libur::isHariLibur($current->toDateString())) {
+                    $dateRange[] = $current->copy();
+                }
+            }
+            $current->addDay();
+        }
+
+        return $dateRange;
+    }
+
+    /**
+     * Resolve attendance status based on presensi record or izin request.
+     */
+    private function resolveAttendanceStatus(?Presensi $presensi, ?PengajuanIjin $izinRequest): array
+    {
+        if ($presensi) {
+            return [
+                'status' => $presensi->status,
+                'jam_datang' => $presensi->jam_datang,
+                'jam_pulang' => $presensi->jam_pulang,
+                'keterangan' => $presensi->keterangan,
+            ];
+        }
+
+        if ($izinRequest) {
+            return [
+                'status' => $izinRequest->jenis_izin,
+                'jam_datang' => null,
+                'jam_pulang' => null,
+                'keterangan' => $izinRequest->alasan,
+            ];
+        }
+
+        return [
+            'status' => 'alfa',
+            'jam_datang' => null,
+            'jam_pulang' => null,
+            'keterangan' => null,
+        ];
+    }
+
+    /**
+     * Calculate summary statistics from history data array.
+     */
+    private function calculateAttendanceStats(array $historiData): array
+    {
+        $collection = collect($historiData);
+        $totalHadir = $collection->where('status', 'hadir')->count();
+        $totalIzin = $collection->where('status', 'izin')->count();
+        $totalSakit = $collection->where('status', 'sakit')->count();
+        $totalAlfa = $collection->where('status', 'alfa')->count();
+        $totalHari = $collection->count();
+
+        return [
+            'hadir' => $totalHadir,
+            'izin' => $totalIzin,
+            'sakit' => $totalSakit,
+            'alfa' => $totalAlfa,
+            'total_hari' => $totalHari,
+            'persentase_hadir' => $totalHari > 0 ? round(($totalHadir / $totalHari) * 100, 1) : 0,
+        ];
     }
 }
 

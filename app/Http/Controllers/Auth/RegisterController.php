@@ -50,14 +50,11 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->jabatan,
             'kelas' => $request->jabatan === 'wali_kelas' ? $request->kelas : null,
-            'is_active' => true, // All new users are active by default
+            'is_active' => false, // New users must be activated by admin
         ]);
 
-        // You can optionally log in the user after registration
-        // auth()->login($user);
-
         return redirect()->route('login')
-            ->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
+            ->with('success', 'Registrasi berhasil! Akun Anda sedang menunggu aktivasi oleh Admin. Silakan hubungi admin sekolah.');
     }
 }
 

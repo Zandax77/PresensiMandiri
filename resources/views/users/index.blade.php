@@ -30,6 +30,49 @@
         font-size: 0.9375rem;
     }
 
+    /* Search Bar */
+    .search-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-form {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .search-input-group {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .form-search {
+        width: 100%;
+        padding: 0.625rem 1rem 0.625rem 2.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+    }
+
+    .form-search:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
     /* Alert Messages */
     .alert {
         padding: 1rem;
@@ -375,6 +418,32 @@
             {{ session('error') }}
         </div>
     @endif
+
+    <!-- Search Bar -->
+    <div class="search-card">
+        <form method="GET" action="{{ route('users.index') }}" class="search-form">
+            <div class="search-input-group">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-search" 
+                    placeholder="Cari nama, email, atau NIS..." 
+                    value="{{ $search ?? '' }}"
+                >
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding: 0.625rem 1.5rem; width: auto;">
+                Cari
+            </button>
+            @if($search)
+                <a href="{{ route('users.index') }}" class="btn btn-cancel" style="display: flex; align-items: center; justify-content: center; height: 100%; text-decoration: none;">
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
 
     <!-- Users Table -->
     <div class="table-card">

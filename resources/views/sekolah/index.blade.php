@@ -754,7 +754,8 @@
                 <h2 class="form-title">Pengaturan Jam Presensi per Hari</h2>
                 <p class="form-hint" style="margin-bottom: 1.5rem;">Atur jam presensi untuk setiap hari dalam seminggu. Centang untuk mengaktifkan hari sekolah.</p>
 
-                <table class="jam-table">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="jam-table">
                     <thead>
                         <tr>
                             <th>Hari</th>
@@ -823,6 +824,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Simpan Jam Presensi</button>

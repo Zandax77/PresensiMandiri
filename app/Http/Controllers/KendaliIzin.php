@@ -17,7 +17,7 @@ class KendaliIzin extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $status = $request->get('status', 'menunggu');
+        $status = $request->input('status', 'menunggu');
 
         // clear related notifications
         if ($user->isWaliKelas() || $user->isSuperAdmin() || $user->isBK()) {
@@ -73,7 +73,7 @@ class KendaliIzin extends Controller
     public function saya(Request $request)
     {
         $user = Auth::user();
-        $status = $request->get('status', 'semua');
+        $status = $request->input('status', 'semua');
 
         $query = PengajuanIjin::where('user_id', $user->id);
 

@@ -51,7 +51,7 @@ class KendaliUtama extends Controller
         }
 
         // Get selected date (default: today)
-        $tanggal = $request->get('tanggal', Carbon::now()->toDateString());
+        $tanggal = $request->input('tanggal', Carbon::now()->toDateString());
 
         // Get all unique classes
         $kelasList = Siswa::distinct()->pluck('kelas')->filter()->sort()->values();
@@ -161,6 +161,9 @@ class KendaliUtama extends Controller
         // Calculate overall percentage
         $persentaseHadirGlobal = $totalSemuaSiswa > 0 ? round(($totalHadir / $totalSemuaSiswa) * 100, 1) : 0;
 
+        // Get trend data for the last 7 days
+        $trendData = $this->getTrendData($tanggal, $user);
+
         return view('dashboard', compact(
             'statsPerKelas',
             'tanggal',
@@ -170,7 +173,8 @@ class KendaliUtama extends Controller
             'totalIzin',
             'totalSakit',
             'totalAlfa',
-            'persentaseHadirGlobal'
+            'persentaseHadirGlobal',
+            'trendData'
         ));
     }
 
@@ -188,7 +192,7 @@ class KendaliUtama extends Controller
         }
 
         // Get selected date (default: today)
-        $tanggal = $request->get('tanggal', Carbon::now()->toDateString());
+        $tanggal = $request->input('tanggal', Carbon::now()->toDateString());
 
         // Get all unique classes
         $kelasList = Siswa::distinct()->pluck('kelas')->filter()->sort()->values();
@@ -298,6 +302,9 @@ class KendaliUtama extends Controller
         // Calculate overall percentage
         $persentaseHadirGlobal = $totalSemuaSiswa > 0 ? round(($totalHadir / $totalSemuaSiswa) * 100, 1) : 0;
 
+        // Get trend data for the last 7 days
+        $trendData = $this->getTrendData($tanggal, $user);
+
         return response()->json([
             'statsPerKelas' => $statsPerKelas,
             'tanggal' => $tanggal,
@@ -307,8 +314,88 @@ class KendaliUtama extends Controller
             'totalSakit' => $totalSakit,
             'totalAlfa' => $totalAlfa,
             'persentaseHadirGlobal' => $persentaseHadirGlobal,
+            'trendData' => $trendData,
             'lastUpdated' => now()->format('H:i:s')
         ]);
+    }
+
+    /**
+     * Get attendance trend data for the last 7 days ending on the selected date.
+     */
+    private function getTrendData($endDate, $user)
+    {
+        $endCarbon = Carbon::parse($endDate);
+        $startCarbon = $endCarbon->copy()->subDays(6);
+        
+        $dates = [];
+        $trendHadir = [];
+        $trendIzin = [];
+        $trendSakit = [];
+        $trendAlfa = [];
+
+        // Determine which students to calculate for
+        $siswaIds = collect();
+        if ($user->isWaliKelas() && $user->kelas) {
+            $siswaIds = Siswa::where('kelas', $user->kelas)->pluck('user_id');
+        } else {
+            $siswaIds = Siswa::pluck('user_id');
+        }
+        $totalSiswa = $siswaIds->count();
+
+        // Loop through each day
+        $current = $startCarbon->copy();
+        while ($current->lte($endCarbon)) {
+            $dateStr = $current->toDateString();
+            $dates[] = $current->format('d/m');
+
+            // Skip weekends
+            if ($current->dayOfWeek === 0 || $current->dayOfWeek === 6 || \App\Models\Libur::isHariLibur($dateStr)) {
+                $trendHadir[] = 0;
+                $trendIzin[] = 0;
+                $trendSakit[] = 0;
+                $trendAlfa[] = 0;
+                $current->addDay();
+                continue;
+            }
+
+            // Get attendance from Presensi
+            $presensi = Presensi::whereIn('user_id', $siswaIds)
+                ->where('tanggal', $dateStr)
+                ->get();
+
+            $hadir = $presensi->where('status', 'hadir')->count();
+            $izinPresensi = $presensi->where('status', 'izin')->count();
+            $sakitPresensi = $presensi->where('status', 'sakit')->count();
+
+            // Get from PengajuanIjin
+            $izinPengajuan = $this->getIzinSakitFromPengajuan($siswaIds, $dateStr);
+
+            // Combine
+            $izin = $izinPresensi > 0 ? $izinPresensi : $izinPengajuan['izin'];
+            $sakit = $sakitPresensi > 0 ? $sakitPresensi : $izinPengajuan['sakit'];
+            
+            if ($izinPresensi == 0 && $sakitPresensi == 0) {
+                $izin = $izinPengajuan['izin'];
+                $sakit = $izinPengajuan['sakit'];
+            }
+
+            $alfa = max(0, $totalSiswa - $hadir - $izin - $sakit);
+
+            $trendHadir[] = $hadir;
+            $trendIzin[] = $izin;
+            $trendSakit[] = $sakit;
+            $trendAlfa[] = $alfa;
+
+            $current->addDay();
+        }
+
+        return [
+            'labels' => $dates,
+            'hadir' => $trendHadir,
+            'izin' => $trendIzin,
+            'sakit' => $trendSakit,
+            'alfa' => $trendAlfa,
+        ];
     }
 }
 

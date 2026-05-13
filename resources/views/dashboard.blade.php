@@ -295,22 +295,7 @@
             </a>
         </form>
 
-        <!-- Real-time Controls -->
-        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e2e8f0;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                <input type="checkbox" id="autoRefresh" checked style="width: 16px; height: 16px; cursor: pointer;">
-                <span style="font-weight: 500; color: #374151;">Auto-refresh (30 detik)</span>
-            </label>
-            <span id="lastUpdated" style="font-size: 0.8125rem; color: #64748b;">
-                Terakhir diperbarui: {{ now()->format('H:i:s') }}
-            </span>
-            <button type="button" id="refreshBtn" class="btn-filter">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="16" height="16" style="display: inline; margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-            </button>
-        </div>
+        </form>
     </div>
 
     <!-- Stats Cards -->
@@ -380,6 +365,14 @@
     @if(count($statsPerKelas) > 0)
     <!-- Charts -->
     <div class="charts-grid">
+        <!-- Line Chart: Trend Kehadiran -->
+        <div class="chart-card" style="grid-column: 1 / -1;">
+            <h3 class="chart-card-title">Tren Kehadiran (7 Hari Terakhir)</h3>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
         <!-- Bar Chart: Total vs Hadir per Kelas -->
         <div class="chart-card">
             <h3 class="chart-card-title">Jumlah Siswa vs Hadir per Kelas</h3>
@@ -400,6 +393,7 @@
     <!-- Table Section -->
     <div class="table-card">
         <h3 class="table-card-title">Detail Presensi per Kelas - {{ \Carbon\Carbon::parse($tanggal)->format('d F Y') }}</h3>
+        <div class="table-responsive" style="overflow-x: auto;">
         <table class="data-table">
             <thead>
                 <tr>
@@ -441,6 +435,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
     @else
     <div class="empty-state">
@@ -458,12 +453,14 @@
 <script>
     // Get the current tanggal from the page
     let currentTanggal = '{{ $tanggal }}';
+    let trendChart = null;
     let barChart = null;
     let doughnutChart = null;
     let autoRefreshInterval = null;
 
     // Initial data from server-side rendering
     const initialStatsPerKelas = @json($statsPerKelas);
+    const initialTrendData = @json($trendData);
     const labels = initialStatsPerKelas.map(stat => stat.kelas);
     const totalSiswa = initialStatsPerKelas.map(stat => stat.total_siswa);
     const hadir = initialStatsPerKelas.map(stat => stat.hadir);
@@ -501,6 +498,16 @@
         const izin = statsPerKelas.map(stat => stat.izin);
         const sakit = statsPerKelas.map(stat => stat.sakit);
         const alfa = statsPerKelas.map(stat => stat.alfa);
+
+        // Update Trend Chart
+        if (trendChart && data.trendData) {
+            trendChart.data.labels = data.trendData.labels;
+            trendChart.data.datasets[0].data = data.trendData.hadir;
+            trendChart.data.datasets[1].data = data.trendData.izin;
+            trendChart.data.datasets[2].data = data.trendData.sakit;
+            trendChart.data.datasets[3].data = data.trendData.alfa;
+            trendChart.update('none');
+        }
 
         // Update Bar Chart
         if (barChart) {
@@ -553,11 +560,6 @@
         tbody.innerHTML = html;
     }
 
-    // Function to update last updated timestamp
-    function updateLastUpdated(timestamp) {
-        document.getElementById('lastUpdated').textContent = 'Terakhir diperbarui: ' + timestamp;
-    }
-
     // Main function to update dashboard
     async function updateDashboard() {
         const data = await fetchDashboardData();
@@ -566,11 +568,78 @@
         updateStatsCards(data);
         updateCharts(data);
         updateTable(data);
-        updateLastUpdated(data.lastUpdated);
     }
 
     // Initialize charts
     function initCharts() {
+        // Trend Chart: 7 Days History
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: initialTrendData.labels,
+                datasets: [
+                    {
+                        label: 'Hadir',
+                        data: initialTrendData.hadir,
+                        borderColor: 'rgba(22, 163, 74, 1)',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Izin',
+                        data: initialTrendData.izin,
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Sakit',
+                        data: initialTrendData.sakit,
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Alfa',
+                        data: initialTrendData.alfa,
+                        borderColor: 'rgba(100, 116, 139, 1)',
+                        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
         // Bar Chart: Total vs Hadir per Kelas
         const barCtx = document.getElementById('barChart').getContext('2d');
         barChart = new Chart(barCtx, {
@@ -664,37 +733,13 @@
         });
     }
 
-    // Function to start/stop auto-refresh
-    function toggleAutoRefresh(enabled) {
-        if (enabled) {
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-            autoRefreshInterval = setInterval(updateDashboard, 30000); // 30 seconds
-        } else {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
-    }
+    // Set up auto-refresh unconditionally
+    autoRefreshInterval = setInterval(updateDashboard, 30000); // 30 seconds
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize charts
         initCharts();
-
-        // Set up auto-refresh
-        const autoRefreshCheckbox = document.getElementById('autoRefresh');
-        toggleAutoRefresh(autoRefreshCheckbox.checked);
-
-        // Listen for checkbox changes
-        autoRefreshCheckbox.addEventListener('change', function() {
-            toggleAutoRefresh(this.checked);
-        });
-
-        // Manual refresh button
-        document.getElementById('refreshBtn').addEventListener('click', function() {
-            updateDashboard();
-        });
 
         // Listen for date filter changes
         const tanggalInput = document.getElementById('tanggal');
